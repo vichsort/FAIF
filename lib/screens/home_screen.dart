@@ -1,3 +1,4 @@
+import 'package:faif/screens/emendas_parlamentares.dart';
 import 'package:flutter/material.dart';
 import 'package:faif/screens/cnpj_screen.dart';
 import 'package:faif/screens/deputado_screen.dart';
@@ -65,8 +66,8 @@ class _HomePageState extends State<HomePage> {
                 _buildServiceIcon(context, Icons.monetization_on, 'COFIEX', () {
                   _showNotImplemented(context);
                 }),
-                _buildServiceIcon(context, Icons.trending_up, 'Portal Da\nTransparência', () {
-                  _showNotImplemented(context);
+                _buildServiceIcon(context, Icons.trending_up, 'Emendas\nParlamentares', () {
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => EmendasPage(emendas: [],)));
                 }),
                 _buildServiceIcon(context, Icons.security, 'CGU', () {
                   _showNotImplemented(context);

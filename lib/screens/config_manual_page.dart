@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-// Variáveis globais (idealmente você coloca num arquivo separado tipo app_config.dart)
 bool isDarkMode = false;
 double fontSize = 16;
 
