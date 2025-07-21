@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
 import '../model/deputado_model.dart';
 import '../components/deputado_card.dart';
+import 'package:faif/screens/config_manual_page.dart';
 
 class DeputadosPage extends StatefulWidget {
   @override
@@ -40,18 +40,24 @@ class DeputadosPageState extends State<DeputadosPage> {
 
   @override
   Widget build(BuildContext context) {
+    final fundo = isDarkMode ? Color(0xFF1A1A1A) : Colors.white;
+    final fundoInput = isDarkMode ? Color(0xFF2A2A2A) : Colors.grey[200]!;
+    final texto = isDarkMode ? Colors.white : Colors.black;
+    final laranja = Color(0xFFFF6B35);
+
+
     return Scaffold(
-      backgroundColor: Color(0xFF1A1A1A), // preto uniforme
+      backgroundColor: fundo,
       appBar: AppBar(
-        backgroundColor: Color(0xFF1A1A1A), // mesmo tom da tela
+        backgroundColor: fundo,
         elevation: 0,
         centerTitle: true,
-        iconTheme: IconThemeData(color: Color(0xFFFF6B35)),
+        iconTheme: IconThemeData(color: laranja),
         title: Text(
           'Deputados',
           style: TextStyle(
-            color: Colors.white, // destaque em laranja
-            fontSize: 22,
+            color: texto,
+            fontSize: fontSize,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -65,50 +71,49 @@ class DeputadosPageState extends State<DeputadosPage> {
                 Expanded(
                   child: TextField(
                     controller: _controller,
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: texto, fontSize: fontSize),
                     decoration: InputDecoration(
                       hintText: 'Buscar deputado',
-                      hintStyle: TextStyle(color: Colors.grey),
+                      hintStyle: TextStyle(color: Colors.grey, fontSize: fontSize - 2),
                       filled: true,
-                      fillColor: Color(0xFF2A2A2A),
+                      fillColor: fundoInput,
                       prefixIcon: Icon(Icons.search, color: Colors.grey),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: Color(0xFFFF6B35), width: 2), // borda laranja
+                        borderSide: BorderSide(color: laranja, width: 2),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: Color(0xFFFF6B35), width: 2), // borda laranja
+                        borderSide: BorderSide(color: laranja, width: 2),
                       ),
                     ),
                   ),
-
                 ),
                 const SizedBox(width: 12),
                 IconButton(
                   onPressed: buscarDeputados,
                   icon: Icon(Icons.search),
-                  color: Color(0xFFFF6B35),
+                  color: laranja,
                   tooltip: 'Buscar',
                   style: ButtonStyle(
-                    backgroundColor: MaterialStatePropertyAll(Color(0xFF2A2A2A)),
+                    backgroundColor: MaterialStatePropertyAll(fundoInput),
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 24),
             _loading
-                ? CircularProgressIndicator(color: Color(0xFFFF6B35))
+                ? CircularProgressIndicator(color: laranja)
                 : _deputados.isEmpty
                     ? Text(
                         'Nenhum resultado encontrado.',
-                        style: TextStyle(color: Colors.white),
+                        style: TextStyle(color: texto, fontSize: fontSize),
                       )
                     : Expanded(
                         child: ListView.builder(
                           itemCount: _deputados.length,
                           itemBuilder: (context, index) {
-                            return DeputadoCard(deputado: _deputados[index]);
+                            return DeputadoCard(deputado: _deputados[index], fontSize: fontSize, isDark: isDarkMode);
                           },
                         ),
                       ),

@@ -1,14 +1,26 @@
-import '../screens/cnpj_screen.dart';
-import '../screens/deputado_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:faif/screens/cnpj_screen.dart';
+import 'package:faif/screens/deputado_screen.dart';
+import 'package:faif/screens/config_manual_page.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
+    final fundo = isDarkMode ? Color(0xFF1A1A1A) : Colors.white;
+    final texto = isDarkMode ? Colors.white : Colors.black;
+    final destaque = Color(0xFFFF6B35);
+    final fundoCard = isDarkMode ? Color(0xFF2A2A2A) : Colors.grey[200]!;
+    final textoSecundario = isDarkMode ? Colors.white70 : Colors.black54;
+
     return Scaffold(
-      backgroundColor: Color(0xFF1A1A1A),
+      backgroundColor: fundo,
       appBar: AppBar(
-        backgroundColor: Color(0xFF1A1A1A),
+        backgroundColor: fundo,
         elevation: 0,
         title: Row(
           children: [
@@ -16,7 +28,7 @@ class HomePage extends StatelessWidget {
               width: 32,
               height: 32,
               decoration: BoxDecoration(
-                color: Color(0xFFFF6B35),
+                color: destaque,
                 shape: BoxShape.circle,
               ),
               child: Image.asset('assets/logo.png'),
@@ -28,7 +40,6 @@ class HomePage extends StatelessWidget {
         padding: EdgeInsets.all(20),
         child: Column(
           children: [
-            // Grid de serviços
             GridView.count(
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
@@ -36,132 +47,103 @@ class HomePage extends StatelessWidget {
               crossAxisSpacing: 20,
               mainAxisSpacing: 20,
               children: [
-                _buildServiceIcon(
-                  context,
-                  Icons.people,
-                  'Deputados',
-                  () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => DeputadosPage()),
-                  ),
-                ),
-                _buildServiceIcon(
-                  context,
-                  Icons.person,
-                  'Consultar\nCPF',
-                  () => _showNotImplemented(context),
-                ),
-                _buildServiceIcon(
-                  context,
-                  Icons.business,
-                  'Consultar\nCNPJ',
-                  () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => CnpjPage()),
-                  ),
-                ),
-                _buildServiceIcon(
-                  context,
-                  Icons.account_balance,
-                  'Estruturas\nExecutivo',
-                  () => _showNotImplemented(context),
-                ),
-                _buildServiceIcon(
-                  context,
-                  Icons.groups,
-                  'Servidores\nExecutivo',
-                  () => _showNotImplemented(context),
-                ),
-                _buildServiceIcon(
-                  context,
-                  Icons.monetization_on,
-                  'COFIEX',
-                  () => _showNotImplemented(context),
-                ),
-                _buildServiceIcon(
-                  context,
-                  Icons.trending_up,
-                  'Portal Da\nTransparência',
-                  () => _showNotImplemented(context),
-                ),
-                _buildServiceIcon(
-                  context,
-                  Icons.security,
-                  'CGU',
-                  () => _showNotImplemented(context),
-                ),
+                _buildServiceIcon(context, Icons.people, 'Deputados', () {
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => DeputadosPage()));
+                }),
+                _buildServiceIcon(context, Icons.person, 'Consultar\nCPF', () {
+                  _showNotImplemented(context);
+                }),
+                _buildServiceIcon(context, Icons.business, 'Consultar\nCNPJ', () {
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => CnpjPage()));
+                }),
+                _buildServiceIcon(context, Icons.account_balance, 'Estruturas\nExecutivo', () {
+                  _showNotImplemented(context);
+                }),
+                _buildServiceIcon(context, Icons.groups, 'Servidores\nExecutivo', () {
+                  _showNotImplemented(context);
+                }),
+                _buildServiceIcon(context, Icons.monetization_on, 'COFIEX', () {
+                  _showNotImplemented(context);
+                }),
+                _buildServiceIcon(context, Icons.trending_up, 'Portal Da\nTransparência', () {
+                  _showNotImplemented(context);
+                }),
+                _buildServiceIcon(context, Icons.security, 'CGU', () {
+                  _showNotImplemented(context);
+                }),
               ],
             ),
-
             SizedBox(height: 30),
-
-            // Card principal de pesquisa
             Container(
               width: double.infinity,
               padding: EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: Color(0xFFFF6B35),
+                color: destaque,
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          'A Ferramenta\nde pesquisa.',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            height: 1.2,
-                          ),
+                  Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                    Expanded(
+                      child: Text(
+                        'A Ferramenta\nde pesquisa.',
+                        style: TextStyle(
+                          color: texto,
+                          fontSize: fontSize + 8,
+                          fontWeight: FontWeight.bold,
+                          height: 1.2,
                         ),
                       ),
-                      Icon(Icons.edit, color: Colors.white, size: 24),
-                    ],
-                  ),
+                    ),
+                    Icon(Icons.edit, color: texto, size: fontSize + 4),
+                  ]),
                   SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Icon(Icons.search, color: Colors.white70, size: 20),
-                      SizedBox(width: 8),
-                      Text(
+                  Row(children: [
+                    Icon(Icons.search, color: textoSecundario, size: fontSize),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
                         'Encontre qualquer informação, tudo num só lugar',
-                        style: TextStyle(color: Colors.white70, fontSize: 14),
+                        style: TextStyle(color: textoSecundario, fontSize: fontSize - 2),
                       ),
-                    ],
-                  ),
+                    ),
+                  ]),
                 ],
               ),
             ),
-
             SizedBox(height: 20),
+            Row(children: [
+              Expanded(
+                child: _buildBottomCard(
+                  'Histórico',
+                  'Suas pesquisas salvas aqui.',
+                  Icons.history,
+                  () => _showNotImplemented(context),
+                  fundoCard,
+                  texto,
+                  textoSecundario,
+                ),
+              ),
+              SizedBox(width: 16),
+              Expanded(
+                child: _buildBottomCard(
+                  'Configurações',
+                  'Deixe o app do seu jeito',
+                  Icons.settings,
+                  () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const ConfigManualPage()),
+                ).then((_) {
+                  setState(() {}); // Isso força a HomePage a se reconstruir com os novos valores
+                }),
 
-            // Cards inferiores
-            Row(
-              children: [
-                Expanded(
-                  child: _buildBottomCard(
-                    'Histórico',
-                    'Suas pesquisas salvas aqui.',
-                    Icons.history,
-                    () => _showNotImplemented(context),
-                  ),
+                  fundoCard,
+                  texto,
+                  textoSecundario,
                 ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: _buildBottomCard(
-                    'Configurações',
-                    '',
-                    Icons.settings,
-                    () => _showNotImplemented(context),
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ]),
           ],
         ),
       ),
@@ -186,13 +168,13 @@ class HomePage extends StatelessWidget {
               color: Color(0xFFFF6B35),
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, color: Colors.white, size: 28),
+            child: Icon(icon, color: Colors.white, size: fontSize + 4),
           ),
           SizedBox(height: 8),
           Text(
             label,
             textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.white, fontSize: 12, height: 1.2),
+            style: TextStyle(color: isDarkMode ? Colors.white : Colors.black, fontSize: fontSize - 4, height: 1.2),
           ),
         ],
       ),
@@ -204,43 +186,40 @@ class HomePage extends StatelessWidget {
     String subtitle,
     IconData icon,
     VoidCallback onTap,
+    Color bgColor,
+    Color titleColor,
+    Color subtitleColor,
   ) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Color(0xFF2A2A2A),
+          color: bgColor,
           borderRadius: BorderRadius.circular(12),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                Icon(Icons.open_in_new, color: Colors.white70, size: 16),
-              ],
-            ),
-            if (subtitle.isNotEmpty) ...[
-              SizedBox(height: 4),
-              Text(
-                subtitle,
-                style: TextStyle(color: Colors.white70, fontSize: 12),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            Text(
+              title,
+              style: TextStyle(
+                color: titleColor,
+                fontSize: fontSize,
+                fontWeight: FontWeight.w600,
               ),
-            ],
-            SizedBox(height: 12),
-            Icon(icon, color: Colors.white70, size: 20),
+            ),
+            Icon(Icons.open_in_new, color: subtitleColor, size: fontSize - 2),
+          ]),
+          if (subtitle.isNotEmpty) ...[
+            SizedBox(height: 4),
+            Text(
+              subtitle,
+              style: TextStyle(color: subtitleColor, fontSize: fontSize - 2),
+            ),
           ],
-        ),
+          SizedBox(height: 12),
+          Icon(icon, color: subtitleColor, size: fontSize + 2),
+        ]),
       ),
     );
   }
@@ -248,7 +227,10 @@ class HomePage extends StatelessWidget {
   void _showNotImplemented(BuildContext context) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Funcionalidade ainda não implementada'),
+        content: Text(
+          'Funcionalidade ainda não implementada',
+          style: TextStyle(fontSize: fontSize),
+        ),
         backgroundColor: Color(0xFFFF6B35),
       ),
     );

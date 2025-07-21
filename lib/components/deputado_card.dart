@@ -4,7 +4,7 @@ import '../model/deputado_model.dart';
 class DeputadoCard extends StatelessWidget {
   final Deputado deputado;
 
-  const DeputadoCard({super.key, required this.deputado});
+  const DeputadoCard({super.key, required this.deputado, required double fontSize, required bool isDark});
 
   @override
   Widget build(BuildContext context) {
