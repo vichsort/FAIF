@@ -34,31 +34,22 @@ class CnpjPageState extends State<CnpjPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF181818),
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(70),
-        child: AppBar(
-          backgroundColor: Color(0xFF181818),
-          elevation: 0,
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () => Navigator.of(context).pop(),
+      backgroundColor: Color(0xFF1A1A1A),
+      appBar: AppBar(
+        backgroundColor: Color(0xFF1A1A1A), // mesmo tom da tela
+        elevation: 0,
+        centerTitle: true,
+        iconTheme: IconThemeData(color: Color(0xFFFF6B35)),
+        title: Text(
+          'Consultar CNPJ',
+          style: TextStyle(
+            color: Colors.white, // destaque em laranja
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
           ),
-          title: Padding(
-            padding: const EdgeInsets.only(top: 16.0, left: 0.0),
-            child: Text(
-              "Consultar CNPJ",
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 28,
-                letterSpacing: 1.2,
-              ),
-            ),
-          ),
-          automaticallyImplyLeading: false,
         ),
       ),
+      
       body: Center(
         child: SingleChildScrollView(
           child: Padding(

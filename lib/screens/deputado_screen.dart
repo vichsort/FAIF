@@ -31,9 +31,9 @@ class DeputadosPageState extends State<DeputadosPage> {
         final List<dynamic> jsonList = json.decode(response.body);
         _deputados = jsonList.map((e) => Deputado.fromJson(e)).toList();
       } else {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text("Erro na consulta.")));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Erro na consulta.")),
+        );
       }
     });
   }
@@ -41,33 +41,77 @@ class DeputadosPageState extends State<DeputadosPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Buscar Deputados')),
+      backgroundColor: Color(0xFF1A1A1A), // preto uniforme
+      appBar: AppBar(
+        backgroundColor: Color(0xFF1A1A1A), // mesmo tom da tela
+        elevation: 0,
+        centerTitle: true,
+        iconTheme: IconThemeData(color: Color(0xFFFF6B35)),
+        title: Text(
+          'Deputados',
+          style: TextStyle(
+            color: Colors.white, // destaque em laranja
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            TextField(
-              controller: _controller,
-              decoration: InputDecoration(
-                labelText: 'Nome do deputado',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 12),
-            ElevatedButton(onPressed: buscarDeputados, child: Text('Buscar')),
-            const SizedBox(height: 24),
-            _loading
-                ? CircularProgressIndicator()
-                : _deputados.isEmpty
-                ? Text('Nenhum resultado encontrado.')
-                : Expanded(
-                    child: ListView.builder(
-                      itemCount: _deputados.length,
-                      itemBuilder: (context, index) {
-                        return DeputadoCard(deputado: _deputados[index]);
-                      },
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _controller,
+                    style: TextStyle(color: Colors.white),
+                    decoration: InputDecoration(
+                      hintText: 'Buscar deputado',
+                      hintStyle: TextStyle(color: Colors.grey),
+                      filled: true,
+                      fillColor: Color(0xFF2A2A2A),
+                      prefixIcon: Icon(Icons.search, color: Colors.grey),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: Color(0xFFFF6B35), width: 2), // borda laranja
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: Color(0xFFFF6B35), width: 2), // borda laranja
+                      ),
                     ),
                   ),
+
+                ),
+                const SizedBox(width: 12),
+                IconButton(
+                  onPressed: buscarDeputados,
+                  icon: Icon(Icons.search),
+                  color: Color(0xFFFF6B35),
+                  tooltip: 'Buscar',
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStatePropertyAll(Color(0xFF2A2A2A)),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+            _loading
+                ? CircularProgressIndicator(color: Color(0xFFFF6B35))
+                : _deputados.isEmpty
+                    ? Text(
+                        'Nenhum resultado encontrado.',
+                        style: TextStyle(color: Colors.white),
+                      )
+                    : Expanded(
+                        child: ListView.builder(
+                          itemCount: _deputados.length,
+                          itemBuilder: (context, index) {
+                            return DeputadoCard(deputado: _deputados[index]);
+                          },
+                        ),
+                      ),
           ],
         ),
       ),
