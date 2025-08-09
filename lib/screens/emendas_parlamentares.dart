@@ -17,6 +17,14 @@ class _EmendasPageState extends State<EmendasPage> {
   String tipoQuery = '';
   String anoQuery = '';
 
+  final List<String> tiposDisponiveis = [
+    'Individual',
+    'De bancada',
+    'De comissão',
+    'De relator',
+    'Extraordinária',
+  ];
+
   @override
   Widget build(BuildContext context) {
     final fundo = isDarkMode ? const Color(0xFF1A1A1A) : Colors.white;
@@ -26,7 +34,7 @@ class _EmendasPageState extends State<EmendasPage> {
 
     List<EmendaModel> emendasFiltradas = widget.emendas.where((e) {
       final autorOK = autorQuery.isEmpty || e.nomeAutor.toLowerCase().contains(autorQuery.toLowerCase());
-      final tipoOK = tipoQuery.isEmpty || e.tipoEmenda.toLowerCase().contains(tipoQuery.toLowerCase());
+      final tipoOK = tipoQuery.isEmpty || e.tipoEmenda.toLowerCase() == tipoQuery.toLowerCase();
       final anoOK = anoQuery.isEmpty || e.ano.toString() == anoQuery;
       return autorOK && tipoOK && anoOK;
     }).toList();
@@ -67,12 +75,22 @@ class _EmendasPageState extends State<EmendasPage> {
             ),
             const SizedBox(height: 10),
 
-            // Campo: Tipo
-            TextField(
-              onChanged: (value) => tipoQuery = value,
-              style: TextStyle(color: texto, fontSize: fontSize),
+            // Campo: Tipo (Dropdown)
+            DropdownButtonFormField<String>(
+              value: tipoQuery.isEmpty ? null : tipoQuery,
+              onChanged: (value) {
+                setState(() {
+                  tipoQuery = value ?? '';
+                });
+              },
+              items: tiposDisponiveis.map((tipo) {
+                return DropdownMenuItem(
+                  value: tipo,
+                  child: Text(tipo, style: TextStyle(color: texto, fontSize: fontSize)),
+                );
+              }).toList(),
               decoration: InputDecoration(
-                labelText: 'Filtrar por tipo',
+                labelText: 'Selecionar tipo',
                 labelStyle: TextStyle(color: texto),
                 filled: true,
                 fillColor: fundoInput,
@@ -81,6 +99,8 @@ class _EmendasPageState extends State<EmendasPage> {
                   borderSide: BorderSide(color: laranja),
                 ),
               ),
+              dropdownColor: fundoInput,
+              style: TextStyle(color: texto, fontSize: fontSize),
             ),
             const SizedBox(height: 10),
 
