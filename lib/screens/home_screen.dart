@@ -50,28 +50,62 @@ class _HomePageState extends State<HomePage> {
               mainAxisSpacing: 20,
               children: [
                 _buildServiceIcon(context, Icons.people, 'Deputados', () {
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => DeputadosPage()));
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => DeputadosPage()),
+                  );
                 }),
                 _buildServiceIcon(context, Icons.person, 'Consultar\nCPF', () {
                   _showNotImplemented(context);
                 }),
-                _buildServiceIcon(context, Icons.business, 'Consultar\nCNPJ', () {
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => CnpjPage()));
-                }),
-                _buildServiceIcon(context, Icons.account_balance, 'Estruturas\nExecutivo', () {
-                  _showNotImplemented(context);
-                }),
-                _buildServiceIcon(context, Icons.groups, 'Servidores\nExecutivo', () {
-                  _showNotImplemented(context);
-                }),
+                _buildServiceIcon(
+                  context,
+                  Icons.business,
+                  'Consultar\nCNPJ',
+                  () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => ConsultaCnpjPage()),
+                    );
+                  },
+                ),
+                _buildServiceIcon(
+                  context,
+                  Icons.account_balance,
+                  'Estruturas\nExecutivo',
+                  () {
+                    _showNotImplemented(context);
+                  },
+                ),
+                _buildServiceIcon(
+                  context,
+                  Icons.groups,
+                  'Servidores\nExecutivo',
+                  () {
+                    _showNotImplemented(context);
+                  },
+                ),
                 _buildServiceIcon(context, Icons.monetization_on, 'COFIEX', () {
                   _showNotImplemented(context);
                 }),
-                _buildServiceIcon(context, Icons.trending_up, 'Emendas\nParlamentares', () {
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => EmendasPage(emendas: [],)));
-                }),
+                _buildServiceIcon(
+                  context,
+                  Icons.trending_up,
+                  'Emendas\nParlamentares',
+                  () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => EmendasPage(emendas: []),
+                      ),
+                    );
+                  },
+                ),
                 _buildServiceIcon(context, Icons.security, 'CGU', () {
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => CguPage ()));
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => CguPage()),
+                  );
                 }),
               ],
             ),
@@ -86,66 +120,85 @@ class _HomePageState extends State<HomePage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                    Expanded(
-                      child: Text(
-                        'A Ferramenta\nde pesquisa.',
-                        style: TextStyle(
-                          color: texto,
-                          fontSize: fontSize + 8,
-                          fontWeight: FontWeight.bold,
-                          height: 1.2,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'A Ferramenta\nde pesquisa.',
+                          style: TextStyle(
+                            color: texto,
+                            fontSize: fontSize + 8,
+                            fontWeight: FontWeight.bold,
+                            height: 1.2,
+                          ),
                         ),
                       ),
-                    ),
-                    Icon(Icons.edit, color: texto, size: fontSize + 4),
-                  ]),
+                      Icon(Icons.edit, color: texto, size: fontSize + 4),
+                    ],
+                  ),
                   SizedBox(height: 16),
-                  Row(children: [
-                    Icon(Icons.search, color: textoSecundario, size: fontSize),
-                    SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        'Encontre qualquer informação, tudo num só lugar',
-                        style: TextStyle(color: textoSecundario, fontSize: fontSize - 2),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.search,
+                        color: textoSecundario,
+                        size: fontSize,
                       ),
-                    ),
-                  ]),
+                      SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Encontre qualquer informação, tudo num só lugar',
+                          style: TextStyle(
+                            color: textoSecundario,
+                            fontSize: fontSize - 2,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
             SizedBox(height: 20),
-            Row(children: [
-              Expanded(
-                child: _buildBottomCard(
-                  'Histórico',
-                  'Suas pesquisas salvas aqui.',
-                  Icons.history,
-                  () => _showNotImplemented(context),
-                  fundoCard,
-                  texto,
-                  textoSecundario,
+            Row(
+              children: [
+                Expanded(
+                  child: _buildBottomCard(
+                    'Histórico',
+                    'Suas pesquisas salvas aqui.',
+                    Icons.history,
+                    () => _showNotImplemented(context),
+                    fundoCard,
+                    texto,
+                    textoSecundario,
+                  ),
                 ),
-              ),
-              SizedBox(width: 16),
-              Expanded(
-                child: _buildBottomCard(
-                  'Configurações',
-                  'Deixe o app do seu jeito',
-                  Icons.settings,
-                  () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const ConfigManualPage()),
-                ).then((_) {
-                  setState(() {}); // Isso força a HomePage a se reconstruir com os novos valores
-                }),
+                SizedBox(width: 16),
+                Expanded(
+                  child: _buildBottomCard(
+                    'Configurações',
+                    'Deixe o app do seu jeito',
+                    Icons.settings,
+                    () =>
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const ConfigManualPage(),
+                          ),
+                        ).then((_) {
+                          setState(
+                            () {},
+                          ); // Isso força a HomePage a se reconstruir com os novos valores
+                        }),
 
-                  fundoCard,
-                  texto,
-                  textoSecundario,
+                    fundoCard,
+                    texto,
+                    textoSecundario,
+                  ),
                 ),
-              ),
-            ]),
+              ],
+            ),
           ],
         ),
       ),
@@ -176,7 +229,11 @@ class _HomePageState extends State<HomePage> {
           Text(
             label,
             textAlign: TextAlign.center,
-            style: TextStyle(color: isDarkMode ? Colors.white : Colors.black, fontSize: fontSize - 4, height: 1.2),
+            style: TextStyle(
+              color: isDarkMode ? Colors.white : Colors.black,
+              fontSize: fontSize - 4,
+              height: 1.2,
+            ),
           ),
         ],
       ),
@@ -200,28 +257,38 @@ class _HomePageState extends State<HomePage> {
           color: bgColor,
           borderRadius: BorderRadius.circular(12),
         ),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            Text(
-              title,
-              style: TextStyle(
-                color: titleColor,
-                fontSize: fontSize,
-                fontWeight: FontWeight.w600,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    color: titleColor,
+                    fontSize: fontSize,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                Icon(
+                  Icons.open_in_new,
+                  color: subtitleColor,
+                  size: fontSize - 2,
+                ),
+              ],
+            ),
+            if (subtitle.isNotEmpty) ...[
+              SizedBox(height: 4),
+              Text(
+                subtitle,
+                style: TextStyle(color: subtitleColor, fontSize: fontSize - 2),
               ),
-            ),
-            Icon(Icons.open_in_new, color: subtitleColor, size: fontSize - 2),
-          ]),
-          if (subtitle.isNotEmpty) ...[
-            SizedBox(height: 4),
-            Text(
-              subtitle,
-              style: TextStyle(color: subtitleColor, fontSize: fontSize - 2),
-            ),
+            ],
+            SizedBox(height: 12),
+            Icon(icon, color: subtitleColor, size: fontSize + 2),
           ],
-          SizedBox(height: 12),
-          Icon(icon, color: subtitleColor, size: fontSize + 2),
-        ]),
+        ),
       ),
     );
   }
