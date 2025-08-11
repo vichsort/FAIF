@@ -31,9 +31,9 @@ class DeputadosPageState extends State<DeputadosPage> {
         final List<dynamic> jsonList = json.decode(response.body);
         _deputados = jsonList.map((e) => Deputado.fromJson(e)).toList();
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Erro na consulta.")),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("Erro na consulta.")));
       }
     });
   }
@@ -44,7 +44,6 @@ class DeputadosPageState extends State<DeputadosPage> {
     final fundoInput = isDarkMode ? Color(0xFF2A2A2A) : Colors.grey[200]!;
     final texto = isDarkMode ? Colors.white : Colors.black;
     final laranja = Color(0xFFFF6B35);
-
 
     return Scaffold(
       backgroundColor: fundo,
@@ -74,7 +73,10 @@ class DeputadosPageState extends State<DeputadosPage> {
                     style: TextStyle(color: texto, fontSize: fontSize),
                     decoration: InputDecoration(
                       hintText: 'Buscar deputado',
-                      hintStyle: TextStyle(color: Colors.grey, fontSize: fontSize - 2),
+                      hintStyle: TextStyle(
+                        color: Colors.grey,
+                        fontSize: fontSize - 2,
+                      ),
                       filled: true,
                       fillColor: fundoInput,
                       prefixIcon: Icon(Icons.search, color: Colors.grey),
@@ -105,18 +107,23 @@ class DeputadosPageState extends State<DeputadosPage> {
             _loading
                 ? CircularProgressIndicator(color: laranja)
                 : _deputados.isEmpty
-                    ? Text(
-                        'Nenhum resultado encontrado.',
-                        style: TextStyle(color: texto, fontSize: fontSize),
-                      )
-                    : Expanded(
-                        child: ListView.builder(
-                          itemCount: _deputados.length,
-                          itemBuilder: (context, index) {
-                            return DeputadoCard(deputado: _deputados[index], fontSize: fontSize, isDark: isDarkMode);
-                          },
-                        ),
-                      ),
+                ? Text(
+                    'Nenhum resultado encontrado.',
+                    style: TextStyle(color: texto, fontSize: fontSize),
+                  )
+                : Expanded(
+                    child: ListView.separated(
+                      itemCount: _deputados.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: 12),
+                      itemBuilder: (context, index) {
+                        return DeputadoCard(
+                          deputado: _deputados[index],
+                          fontSize: fontSize,
+                          isDark: isDarkMode,
+                        );
+                      },
+                    ),
+                  ),
           ],
         ),
       ),
