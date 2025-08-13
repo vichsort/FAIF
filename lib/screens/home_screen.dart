@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:faif/screens/cnpj_screen.dart';
 import 'package:faif/screens/deputado_screen.dart';
 import 'package:faif/screens/config_manual_page.dart';
+import 'package:faif/screens/ibge_screen.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -82,9 +83,14 @@ class _HomePageState extends State<HomePage> {
                   Icons.groups,
                   'Servidores\nExecutivo',
                   () {
-                    _showNotImplemented(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => IBGEScreen()),
+                    );
                   },
                 ),
+
+
                 _buildServiceIcon(context, Icons.monetization_on, 'COFIEX', () {
                   _showNotImplemented(context);
                 }),
