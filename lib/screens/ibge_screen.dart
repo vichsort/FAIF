@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../model/ibge_model.dart';
 import '../components/ibge_card.dart';
+import 'package:faif/screens/config_manual_page.dart';
 
 class IBGEScreen extends StatefulWidget {
   @override
@@ -40,11 +41,10 @@ class _IBGEScreenState extends State<IBGEScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = false;
-    final fundo = isDarkMode ? Color(0xFF1A1A1A) : Colors.white;
-    final fundoInput = isDarkMode ? Color(0xFF2A2A2A) : Colors.grey[200]!;
+    final fundo = isDarkMode ? const Color(0xFF1A1A1A) : Colors.white;
+    final fundoInput = isDarkMode ? const Color(0xFF2A2A2A) : Colors.grey[200]!;
     final texto = isDarkMode ? Colors.white : Colors.black;
-    final laranja = Color(0xFFFF6B35);
+    final laranja = const Color(0xFFFF6B35);
 
     return Scaffold(
       backgroundColor: fundo,

@@ -5,6 +5,7 @@ import 'package:faif/screens/cnpj_screen.dart';
 import 'package:faif/screens/deputado_screen.dart';
 import 'package:faif/screens/config_manual_page.dart';
 import 'package:faif/screens/ibge_screen.dart';
+import 'package:faif/screens/busca_unificada_screen.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -56,8 +57,11 @@ class _HomePageState extends State<HomePage> {
                     MaterialPageRoute(builder: (_) => DeputadosPage()),
                   );
                 }),
-                _buildServiceIcon(context, Icons.person, 'Consultar\nCPF', () {
-                  _showNotImplemented(context);
+                _buildServiceIcon(context, Icons.trending_up, 'Emendas\nParlamentares', () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => EmendasPage(emendas: [],)),
+                    );
                 }),
                 _buildServiceIcon(
                   context,
@@ -73,9 +77,12 @@ class _HomePageState extends State<HomePage> {
                 _buildServiceIcon(
                   context,
                   Icons.account_balance,
-                  'Estruturas\nExecutivo',
+                  'Pesquisas\nIBGE',
                   () {
-                    _showNotImplemented(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => IBGEScreen()),
+                    );
                   },
                 ),
                 _buildServiceIcon(
@@ -83,10 +90,7 @@ class _HomePageState extends State<HomePage> {
                   Icons.groups,
                   'Servidores\nExecutivo',
                   () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => IBGEScreen()),
-                    );
+                    _showNotImplemented(context);
                   },
                 ),
 
@@ -99,73 +103,74 @@ class _HomePageState extends State<HomePage> {
                   Icons.trending_up,
                   'Emendas\nParlamentares',
                   () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => EmendasPage(emendas: []),
-                      ),
-                    );
+                    _showNotImplemented(context);
                   },
                 ),
                 _buildServiceIcon(context, Icons.security, 'CGU', () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => CguPage()),
-                  );
+                  _showNotImplemented(context);
                 }),
               ],
             ),
             SizedBox(height: 30),
-            Container(
-              width: double.infinity,
-              padding: EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: destaque,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          'A Ferramenta\nde pesquisa.',
-                          style: TextStyle(
-                            color: texto,
-                            fontSize: fontSize + 8,
-                            fontWeight: FontWeight.bold,
-                            height: 1.2,
-                          ),
-                        ),
-                      ),
-                      Icon(Icons.edit, color: texto, size: fontSize + 4),
-                    ],
-                  ),
-                  SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.search,
-                        color: textoSecundario,
-                        size: fontSize,
-                      ),
-                      SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          'Encontre qualquer informação, tudo num só lugar',
-                          style: TextStyle(
-                            color: textoSecundario,
-                            fontSize: fontSize - 2,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+            GestureDetector(
+  onTap: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => BuscaUnificadaPage()),
+    );
+  },
+  child: Container(
+    width: double.infinity,
+    padding: EdgeInsets.all(24),
+    decoration: BoxDecoration(
+      color: destaque,
+      borderRadius: BorderRadius.circular(16),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Text(
+                'A Ferramenta\nde pesquisa.',
+                style: TextStyle(
+                  color: texto,
+                  fontSize: fontSize + 8,
+                  fontWeight: FontWeight.bold,
+                  height: 1.2,
+                ),
               ),
             ),
+            Icon(Icons.edit, color: texto, size: fontSize + 4),
+          ],
+        ),
+        SizedBox(height: 16),
+        Row(
+          children: [
+            Icon(
+              Icons.search,
+              color: textoSecundario,
+              size: fontSize,
+            ),
+            SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'Encontre qualquer informação, tudo num só lugar',
+                style: TextStyle(
+                  color: textoSecundario,
+                  fontSize: fontSize - 2,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    ),
+  ),
+),
+
             SizedBox(height: 20),
             Row(
               children: [

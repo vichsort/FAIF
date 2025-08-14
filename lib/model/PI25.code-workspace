@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "../.."
+		},
+		{
+			"path": "../../../FAIFApi"
+		}
+	],
+	"settings": {
+		"workbench.activityBar.iconClickBehavior": "toggle"
+	}
+}
