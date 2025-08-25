@@ -14,7 +14,6 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'FAIF',
       theme: ThemeData(
-        primarySwatch: Colors.indigo, // FF7A28
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: HomePage(),

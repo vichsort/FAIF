@@ -43,7 +43,7 @@ class _EmendasPageState extends State<EmendasPage> {
     if (anoQuery.trim().isNotEmpty) params['ano'] = anoQuery.trim();
 
     final uri = Uri.parse(
-      'http://localhost:5000/faif/portal-transparencia/emendas/$_page',
+      'http://localhost:5000/faif/transparencia/$_page',
     ).replace(queryParameters: params.isEmpty ? null : params);
 
     try {

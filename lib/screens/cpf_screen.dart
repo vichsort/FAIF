@@ -1,70 +1,74 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+
 import '../model/cpf_model.dart';
 import '../components/cpf_card.dart';
-import 'package:faif/screens/config_manual_page.dart';
 
-class CpfPage extends StatefulWidget {
+class CpfScreen extends StatefulWidget {
+  const CpfScreen({super.key});
+
   @override
-  CpfPageState createState() => CpfPageState();
+  State<CpfScreen> createState() => _CpfScreenState();
 }
 
-class CpfPageState extends State<CpfPage> {
-  final TextEditingController _controller = TextEditingController();
-  bool _loading = false;
-  List<CpfConjunto> _todosConjuntos = [];
-  List<CpfConjunto> _conjuntosFiltrados = [];
+class _CpfScreenState extends State<CpfScreen> {
+  final TextEditingController _cpfController = TextEditingController();
+  final TextEditingController _nisController = TextEditingController();
 
-  Future<void> buscarConjuntos() async {
+  bool _loading = false;
+  Map<String, dynamic>? _dadosPessoa;
+
+  Future<void> buscarPessoa() async {
+    final cpf = _cpfController.text.trim();
+    final nis = _nisController.text.trim();
+
+    if (cpf.isEmpty || nis.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Informe CPF e NIS.")),
+      );
+      return;
+    }
+
     setState(() {
       _loading = true;
-      _todosConjuntos = [];
-      _conjuntosFiltrados = [];
+      _dadosPessoa = null;
     });
 
-    final url = Uri.parse('http://localhost:5000/faif/portal-transparencia/pessoa-fisica/12345678900&12345678900');
-    final response = await http.get(url);
+    try {
+      final url = Uri.parse(
+          "http://localhost:5000/faif/transparencia/pessoa-fisica/$cpf&$nis");
 
-    setState(() {
-      _loading = false;
+      final response = await http.get(url);
+
       if (response.statusCode == 200) {
-        final List<dynamic> jsonList = json.decode(response.body);
-        _todosConjuntos = jsonList.map((e) => CpfConjunto.fromJson(e)).toList();
-        _conjuntosFiltrados = List.from(_todosConjuntos);
+        final data = json.decode(response.body);
+
+        setState(() {
+          _dadosPessoa = data;
+        });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Erro ao buscar dados da Pessoa Física.")),
+          const SnackBar(content: Text("Erro ao buscar dados da Pessoa Física.")),
         );
       }
-    });
-  }
-
-  void filtrarConjuntos() {
-    final termo = _controller.text.trim().toLowerCase();
-    setState(() {
-      if (termo.isEmpty) {
-        _conjuntosFiltrados = List.from(_todosConjuntos);
-      } else {
-        _conjuntosFiltrados = _todosConjuntos
-            .where((c) => c.titulo.toLowerCase().contains(termo))
-            .toList();
-      }
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    buscarConjuntos();
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Erro: $e")),
+      );
+    } finally {
+      setState(() {
+        _loading = false;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final fundo = isDarkMode ? Color(0xFF1A1A1A) : Colors.white;
-    final fundoInput = isDarkMode ? Color(0xFF2A2A2A) : Colors.grey[200]!;
-    final texto = isDarkMode ? Colors.white : Colors.black;
-    final laranja = Color(0xFFFF6B35);
+    final fundo = Colors.black;
+    final fundoInput = const Color(0xFF2A2A2A);
+    final texto = Colors.white;
+    final laranja = const Color(0xFFFF6B35);
 
     return Scaffold(
       backgroundColor: fundo,
@@ -72,79 +76,101 @@ class CpfPageState extends State<CpfPage> {
         backgroundColor: fundo,
         elevation: 0,
         centerTitle: true,
-        iconTheme: IconThemeData(color: laranja),
         title: Text(
-          'Dados CPF',
+          'Consultar CPF',
           style: TextStyle(
             color: texto,
-            fontSize: fontSize,
+            fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
         ),
+        iconTheme: IconThemeData(color: laranja),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _controller,
-                    style: TextStyle(color: texto, fontSize: fontSize),
-                    decoration: InputDecoration(
-                      hintText: 'Buscar por título',
-                      hintStyle: TextStyle(color: Colors.grey, fontSize: fontSize - 2),
-                      filled: true,
-                      fillColor: fundoInput,
-                      prefixIcon: Icon(Icons.search, color: Colors.grey),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: laranja, width: 2),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: laranja, width: 2),
-                      ),
-                    ),
-                    onSubmitted: (_) => filtrarConjuntos(),
-                  ),
+            // Input CPF
+            TextField(
+              controller: _cpfController,
+              style: TextStyle(color: texto),
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                hintText: 'Digite o CPF',
+                hintStyle: const TextStyle(color: Colors.grey),
+                filled: true,
+                fillColor: fundoInput,
+                prefixIcon: const Icon(Icons.badge, color: Colors.grey),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: laranja, width: 2),
                 ),
-                const SizedBox(width: 12),
-                IconButton(
-                  onPressed: filtrarConjuntos,
-                  icon: Icon(Icons.search),
-                  color: laranja,
-                  tooltip: 'Buscar',
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStatePropertyAll(fundoInput),
-                  ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: laranja, width: 2),
                 ),
-              ],
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            // Input NIS
+            TextField(
+              controller: _nisController,
+              style: TextStyle(color: texto),
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                hintText: 'Digite o NIS',
+                hintStyle: const TextStyle(color: Colors.grey),
+                filled: true,
+                fillColor: fundoInput,
+                prefixIcon: const Icon(Icons.numbers, color: Colors.grey),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: laranja, width: 2),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: laranja, width: 2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // Botão buscar
+            ElevatedButton.icon(
+              onPressed: buscarPessoa,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: laranja,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                minimumSize: const Size.fromHeight(50),
+              ),
+              icon: const Icon(Icons.search, color: Colors.white),
+              label: const Text("Buscar", style: TextStyle(color: Colors.white)),
             ),
             const SizedBox(height: 24),
-            _loading
-                ? CircularProgressIndicator(color: laranja)
-                : _conjuntosFiltrados.isEmpty
-                    ? Text(
-                        'Nenhum conjunto encontrado.',
-                        style: TextStyle(color: texto, fontSize: fontSize),
-                      )
-                    : Expanded(
-                        child: ListView.builder(
-                          itemCount: _conjuntosFiltrados.length,
-                          itemBuilder: (context, index) {
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 16),
-                              child: CpfCard(
-                                conjunto: _conjuntosFiltrados[index],
-                                fontSize: fontSize,
-                                isDark: isDarkMode,
-                              ),
-                            );
-                          },
+
+            // Resultado
+            Expanded(
+              child: _loading
+                  ? Center(child: CircularProgressIndicator(color: laranja))
+                  : _dadosPessoa == null
+                      ? Center(
+                          child: Text(
+                            "Nenhum dado carregado.",
+                            style: TextStyle(color: texto),
+                          ),
+                        )
+                      : ListView(
+                          children: [
+                            CpfCard(
+                              dados: _dadosPessoa!,
+                              isDark: true,
+                            ),
+                          ],
                         ),
-                      ),
+            ),
           ],
         ),
       ),
