@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:faif/screens/config_manual_page.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -65,9 +66,9 @@ class _CpfScreenState extends State<CpfScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final fundo = Colors.black;
-    final fundoInput = const Color(0xFF2A2A2A);
-    final texto = Colors.white;
+    final fundo = isDarkMode ? const Color(0xFF1A1A1A) : Colors.white;
+    final fundoInput = isDarkMode ? const Color(0xFF2A2A2A) : Colors.grey[200]!;
+    final texto = isDarkMode ? Colors.white : Colors.black;
     final laranja = const Color(0xFFFF6B35);
 
     return Scaffold(

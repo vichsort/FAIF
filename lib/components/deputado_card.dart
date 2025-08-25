@@ -13,8 +13,9 @@ class DeputadoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final fundo = isDark ? const Color(0xFF1E1F23) : Colors.grey[100]!;
-    final texto = isDark ? Colors.white : Colors.black87;
+    final fundo = isDark ? const Color(0xFF1A1A1A) : Colors.white;
+    final fundoInput = isDark ? const Color(0xFF2A2A2A) : Colors.grey[200]!;
+    final texto = isDark ? Colors.white : Colors.black;
     final laranja = const Color(0xFFFF6B35);
 
     return Container(

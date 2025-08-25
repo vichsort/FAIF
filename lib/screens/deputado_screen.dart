@@ -63,7 +63,6 @@ class DeputadosPageState extends State<DeputadosPage> {
               ),
               const SizedBox(height: 20),
 
-              // campo de busca estilizado
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 decoration: BoxDecoration(
@@ -80,7 +79,7 @@ class DeputadosPageState extends State<DeputadosPage> {
                         controller: _controller,
                         style: TextStyle(color: texto, fontSize: 16),
                         decoration: InputDecoration(
-                          hintText: "pesquisa...",
+                          hintText: "Pesquisa...",
                           hintStyle: TextStyle(color: Colors.grey[500]),
                           border: InputBorder.none,
                         ),

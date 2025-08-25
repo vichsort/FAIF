@@ -38,7 +38,6 @@ class _ConsultaCnpjPageState extends State<ConsultaCnpjPage> {
           final Map<String, dynamic> dados = json.decode(response.body);
           _dados = dados;
         } else {
-          // Tenta extrair mensagem de erro padronizada
           try {
             final Map<String, dynamic> err = json.decode(response.body);
             _erro = err['error']?['message'] ?? 'Erro na consulta.';
@@ -91,12 +90,12 @@ class _ConsultaCnpjPageState extends State<ConsultaCnpjPage> {
                   decoration: InputDecoration(
                     labelText: 'CNPJ',
                     labelStyle: TextStyle(
-                      color: texto.withOpacity(0.7),
+                      color: texto,
                       fontSize: fontSize - 2,
                     ),
                     hintText: 'XX.XXX.XXX/0001-XX',
                     hintStyle: TextStyle(
-                      color: texto.withOpacity(0.6),
+                      color: texto,
                       fontSize: fontSize - 2,
                     ),
                     filled: true,

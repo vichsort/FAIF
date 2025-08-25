@@ -81,7 +81,6 @@ class _EmendasPageState extends State<EmendasPage> {
   void initState() {
     super.initState();
     _emendas = List.from(widget.emendas);
-    // Busca inicial (página 1, sem filtros) para popular a tela
     _buscarEmendas(page: 1);
   }
 
@@ -92,7 +91,6 @@ class _EmendasPageState extends State<EmendasPage> {
     final texto = isDarkMode ? Colors.white : Colors.black;
     final laranja = const Color(0xFFFF6B35);
 
-    // Resultado exibido é exatamente o retornado pela API após aplicar filtros
     final emendasFiltradas = _emendas;
 
     return Scaffold(
@@ -131,7 +129,6 @@ class _EmendasPageState extends State<EmendasPage> {
             ),
             const SizedBox(height: 10),
 
-            // Campo: Tipo (Dropdown)
             DropdownButtonFormField<String>(
               value: tipoQuery.isEmpty ? 'Todos' : tipoQuery,
               onChanged: (value) {
@@ -167,7 +164,6 @@ class _EmendasPageState extends State<EmendasPage> {
             ),
             const SizedBox(height: 10),
 
-            // Campo: Ano
             TextField(
               keyboardType: TextInputType.number,
               onChanged: (value) => anoQuery = value,
@@ -185,12 +181,10 @@ class _EmendasPageState extends State<EmendasPage> {
             ),
             const SizedBox(height: 16),
 
-            // Botão de pesquisa
             ElevatedButton.icon(
               onPressed: _loading
                   ? null
                   : () {
-                      // Dispara busca no backend com os filtros atuais
                       _buscarEmendas(page: 1);
                     },
               icon: Icon(Icons.search, size: fontSize, color: Colors.white),
@@ -211,7 +205,6 @@ class _EmendasPageState extends State<EmendasPage> {
             ),
             const SizedBox(height: 16),
 
-            // Lista de cards
             Expanded(
               child: _loading
                   ? Center(child: CircularProgressIndicator(color: laranja))
