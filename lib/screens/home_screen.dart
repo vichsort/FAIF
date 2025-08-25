@@ -1,4 +1,3 @@
-import 'package:faif/screens/cgu_screen.dart';
 import 'package:faif/screens/emendas_parlamentares.dart';
 import 'package:flutter/material.dart';
 import 'package:faif/screens/cnpj_screen.dart';

@@ -3,19 +3,17 @@ import '../model/deputado_model.dart';
 
 class DeputadoCard extends StatelessWidget {
   final Deputado deputado;
-  final double fontSize;
   final bool isDark;
 
   const DeputadoCard({
     super.key,
     required this.deputado,
-    required this.fontSize,
     required this.isDark,
   });
 
   @override
   Widget build(BuildContext context) {
-    final fundo = isDark ? const Color(0xFF2A2A2A) : Colors.white;
+    final fundo = isDark ? const Color(0xFF1E1F23) : Colors.grey[100]!;
     final texto = isDark ? Colors.white : Colors.black87;
     final laranja = const Color(0xFFFF6B35);
 
@@ -23,22 +21,43 @@ class DeputadoCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: fundo,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: laranja, width: 1.5),
       ),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(12),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: Image.network(
-              deputado.urlFoto,
-              height: 120,
-              width: 96,
-              fit: BoxFit.contain,
+          // Foto ou placeholder
+          Container(
+            height: 90,
+            width: 70,
+            decoration: BoxDecoration(
+              color: laranja,
+              borderRadius: BorderRadius.circular(8),
             ),
+            child: deputado.urlFoto.isNotEmpty
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.network(
+                      deputado.urlFoto,
+                      fit: BoxFit.cover,
+                    ),
+                  )
+                : Center(
+                    child: Text(
+                      "(Foto do deputado)",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
           ),
-          const SizedBox(width: 16),
+
+          const SizedBox(width: 12),
+
+          // Informações
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -47,41 +66,54 @@ class DeputadoCard extends StatelessWidget {
                   deputado.nome,
                   style: TextStyle(
                     color: texto,
-                    fontSize: fontSize + 2,
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 6),
-                _linha('Partido', deputado.siglaPartido, texto),
-                _linha('UF', deputado.siglaUf, texto),
-                if (deputado.email.isNotEmpty)
-                  _linha('Email', deputado.email, texto),
+                const SizedBox(height: 4),
+                Text(
+                  deputado.siglaPartido.isNotEmpty
+                      ? deputado.siglaPartido
+                      : "Nome do deputado",
+                  style: TextStyle(color: texto, fontSize: 14),
+                ),
+                const SizedBox(height: 8),
+
+                // Botão acessar
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: laranja,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 6),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    textStyle: const TextStyle(fontSize: 12),
+                  ),
+                  onPressed: () {
+                    // TODO: ação acessar deputado
+                  },
+                  child: const Text("Acessar"),
+                ),
+
+                const SizedBox(height: 8),
+
+                // Referência
+                Align(
+                  alignment: Alignment.bottomRight,
+                  child: Text(
+                    "Referência | Ver fonte",
+                    style: TextStyle(
+                      color: texto,
+                      fontSize: 10,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _linha(String titulo, String valor, Color color) {
-    if (valor.isEmpty) return const SizedBox.shrink();
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 4.0),
-      child: RichText(
-        text: TextSpan(
-          style: TextStyle(color: color, fontSize: fontSize - 2),
-          children: [
-            TextSpan(
-              text: '$titulo: ',
-              style: TextStyle(fontWeight: FontWeight.bold, color: color),
-            ),
-            TextSpan(
-              text: valor,
-              style: TextStyle(color: color),
-            ),
-          ],
-        ),
       ),
     );
   }

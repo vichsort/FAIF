@@ -40,91 +40,86 @@ class DeputadosPageState extends State<DeputadosPage> {
 
   @override
   Widget build(BuildContext context) {
-    final fundo = isDarkMode ? Color(0xFF1A1A1A) : Colors.white;
-    final fundoInput = isDarkMode ? Color(0xFF2A2A2A) : Colors.grey[200]!;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final fundo = isDarkMode ? const Color(0xFF0F1115) : Colors.white;
     final texto = isDarkMode ? Colors.white : Colors.black;
-    final laranja = Color(0xFFFF6B35);
+    final laranja = const Color(0xFFFF6B35);
 
     return Scaffold(
       backgroundColor: fundo,
-      appBar: AppBar(
-        backgroundColor: fundo,
-        elevation: 0,
-        centerTitle: true,
-        iconTheme: IconThemeData(color: laranja),
-        title: Text(
-          'Deputados',
-          style: TextStyle(
-            color: texto,
-            fontSize: fontSize,
-            fontWeight: FontWeight.bold,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Deputados",
+                style: TextStyle(
+                  color: texto,
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // campo de busca estilizado
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                decoration: BoxDecoration(
+                  color: isDarkMode ? const Color(0xFF1E1F23) : Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: laranja, width: 2),
+                ),
+                child: Row(
+                  children: [
+                    Image.asset("assets/logo.png", width: 28, height: 28),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: TextField(
+                        controller: _controller,
+                        style: TextStyle(color: texto, fontSize: 16),
+                        decoration: InputDecoration(
+                          hintText: "pesquisa...",
+                          hintStyle: TextStyle(color: Colors.grey[500]),
+                          border: InputBorder.none,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: buscarDeputados,
+                      icon: Icon(Icons.search, color: laranja, size: 26),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              // resultados
+              Expanded(
+                child: _loading
+                    ? Center(child: CircularProgressIndicator(color: laranja))
+                    : _deputados.isEmpty
+                    ? Center(
+                        child: Text(
+                          'Nenhum resultado encontrado.',
+                          style: TextStyle(color: texto, fontSize: 16),
+                        ),
+                      )
+                    : ListView.separated(
+                        itemCount: _deputados.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 16),
+                        itemBuilder: (context, index) {
+                          return DeputadoCard(
+                            deputado: _deputados[index],
+                            isDark: isDarkMode,
+                          );
+                        },
+                      ),
+              ),
+            ],
           ),
-        ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _controller,
-                    style: TextStyle(color: texto, fontSize: fontSize),
-                    decoration: InputDecoration(
-                      hintText: 'Buscar deputado',
-                      hintStyle: TextStyle(
-                        color: Colors.grey,
-                        fontSize: fontSize - 2,
-                      ),
-                      filled: true,
-                      fillColor: fundoInput,
-                      prefixIcon: Icon(Icons.search, color: Colors.grey),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: laranja, width: 2),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: laranja, width: 2),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                IconButton(
-                  onPressed: buscarDeputados,
-                  icon: Icon(Icons.search),
-                  color: laranja,
-                  tooltip: 'Buscar',
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStatePropertyAll(fundoInput),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-            _loading
-                ? CircularProgressIndicator(color: laranja)
-                : _deputados.isEmpty
-                ? Text(
-                    'Nenhum resultado encontrado.',
-                    style: TextStyle(color: texto, fontSize: fontSize),
-                  )
-                : Expanded(
-                    child: ListView.separated(
-                      itemCount: _deputados.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 12),
-                      itemBuilder: (context, index) {
-                        return DeputadoCard(
-                          deputado: _deputados[index],
-                          fontSize: fontSize,
-                          isDark: isDarkMode,
-                        );
-                      },
-                    ),
-                  ),
-          ],
         ),
       ),
     );
