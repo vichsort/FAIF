@@ -1,3 +1,4 @@
+import 'package:faif/screens/cgu_screen.dart';
 import 'package:faif/screens/emendas_parlamentares.dart';
 import 'package:flutter/material.dart';
 import 'package:faif/screens/cnpj_screen.dart';
@@ -84,30 +85,6 @@ class _HomePageState extends State<HomePage> {
                     );
                   },
                 ),
-                _buildServiceIcon(
-                  context,
-                  Icons.groups,
-                  'Servidores\nExecutivo',
-                  () {
-                    _showNotImplemented(context);
-                  },
-                ),
-
-
-                _buildServiceIcon(context, Icons.monetization_on, 'COFIEX', () {
-                  _showNotImplemented(context);
-                }),
-                _buildServiceIcon(
-                  context,
-                  Icons.trending_up,
-                  'Emendas\nParlamentares',
-                  () {
-                    _showNotImplemented(context);
-                  },
-                ),
-                _buildServiceIcon(context, Icons.security, 'CGU', () {
-                  _showNotImplemented(context);
-                }),
               ],
             ),
             SizedBox(height: 30),
