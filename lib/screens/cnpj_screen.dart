@@ -29,7 +29,7 @@ class _ConsultaCnpjPageState extends State<ConsultaCnpjPage> {
       return;
     }
 
-    final url = Uri.parse('http://localhost:5000/cnpj/$cnpj');
+    final url = Uri.parse('http://localhost:5000/faif/cnpj/$cnpj');
     try {
       final response = await http.get(url);
       setState(() {
@@ -38,6 +38,7 @@ class _ConsultaCnpjPageState extends State<ConsultaCnpjPage> {
           final Map<String, dynamic> dados = json.decode(response.body);
           _dados = dados;
         } else {
+          // Tenta extrair mensagem de erro padronizada
           try {
             final Map<String, dynamic> err = json.decode(response.body);
             _erro = err['error']?['message'] ?? 'Erro na consulta.';
@@ -76,92 +77,82 @@ class _ConsultaCnpjPageState extends State<ConsultaCnpjPage> {
           ),
         ),
       ),
-      body: Center(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 8.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: _controller,
-                  style: TextStyle(color: texto, fontSize: fontSize),
-                  onSubmitted: (_) => consultarCnpj(),
-                  decoration: InputDecoration(
-                    labelText: 'CNPJ',
-                    labelStyle: TextStyle(
-                      color: texto,
-                      fontSize: fontSize - 2,
-                    ),
-                    hintText: 'XX.XXX.XXX/0001-XX',
-                    hintStyle: TextStyle(
-                      color: texto,
-                      fontSize: fontSize - 2,
-                    ),
-                    filled: true,
-                    fillColor: fundoInput,
-                    border: const OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(12.0)),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: const BorderRadius.all(
-                        Radius.circular(12.0),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 8.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                    controller: _controller,
+                    style: TextStyle(color: texto, fontSize: fontSize),
+                    decoration: InputDecoration(
+                      hintText: 'Buscar CNPJ',
+                      hintStyle: TextStyle(
+                        color: Colors.grey,
+                        fontSize: fontSize - 2,
                       ),
-                      borderSide: BorderSide(color: laranja, width: 2),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: const BorderRadius.all(
-                        Radius.circular(12.0),
+                      filled: true,
+                      fillColor: fundoInput,
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: laranja, width: 2),
                       ),
-                      borderSide: BorderSide(color: laranja, width: 2),
-                    ),
-                    suffixIcon: IconButton(
-                      icon: Icon(Icons.search, color: laranja),
-                      onPressed: _loading ? null : consultarCnpj,
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: laranja, width: 2),
+                      ),
                     ),
                   ),
-                  keyboardType: TextInputType.text,
+                  ),
+                  IconButton(
+                    onPressed: consultarCnpj,
+                    icon: Icon(Icons.search),
+                    color: laranja,
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 24),
+
+              if (_loading) CircularProgressIndicator(color: laranja),
+
+              if (!_loading && _erro != null)
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: isDarkMode
+                        ? const Color(0xFF2B1B16)
+                        : const Color(0xFFFFE9E1),
+                    border: Border.all(color: laranja, width: 1.5),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    _erro!,
+                    style: TextStyle(color: texto, fontSize: fontSize),
+                  ),
                 ),
-                const SizedBox(height: 24),
 
-                if (_loading) CircularProgressIndicator(color: laranja),
-
-                if (!_loading && _erro != null)
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: isDarkMode
-                          ? const Color(0xFF2B1B16)
-                          : const Color(0xFFFFE9E1),
-                      border: Border.all(color: laranja, width: 1.5),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      _erro!,
-                      style: TextStyle(color: texto, fontSize: fontSize),
-                    ),
+              if (!_loading && _dados != null)
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: isDarkMode ? const Color(0xFF100C0A) : Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: laranja, width: 2),
                   ),
-
-                if (!_loading && _dados != null)
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      color: isDarkMode
-                          ? const Color(0xFF100C0A)
-                          : Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: laranja, width: 2),
-                    ),
-                    child: _CnpjDetalhes(
-                      dados: _dados!,
-                      texto: texto,
-                      laranja: laranja,
-                    ),
+                  child: _CnpjDetalhes(
+                    dados: _dados!,
+                    texto: texto,
+                    laranja: laranja,
                   ),
-              ],
-            ),
+                ),
+            ],
           ),
         ),
       ),
