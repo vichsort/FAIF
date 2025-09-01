@@ -54,37 +54,50 @@ class _IBGEScreenState extends State<IBGEScreen> {
       appBar: AppBar(
         backgroundColor: fundo,
         elevation: 0,
-        title: Text('IBGE - Pesquisas', style: TextStyle(color: texto)),
+        iconTheme: IconThemeData(color: laranja),
+        title: Text(
+          'Pesquisas IBGE',
+          style: TextStyle(
+            color: texto,
+            fontSize: fontSize,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _controller,
-                    style: TextStyle(color: texto),
-                    decoration: InputDecoration(
-                      hintText: 'Buscar pesquisa',
-                      hintStyle: TextStyle(color: Colors.grey),
-                      filled: true,
-                      fillColor: fundoInput,
-                      prefixIcon: Icon(Icons.search, color: Colors.grey),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
+            Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                decoration: BoxDecoration(
+                  color: fundoInput,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: laranja, width: 2),
+                ),
+                child: Row(
+                  children: [
+                    Image.asset("assets/logo.png", width: 28, height: 28),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: TextField(
+                        controller: _controller,
+                        style: TextStyle(color: texto, fontSize: 16),
+                        decoration: InputDecoration(
+                          hintText: "Pesquisar por nome...",
+                          hintStyle: TextStyle(color: Colors.grey[500]),
+                          border: InputBorder.none,
+                        ),
+                        onSubmitted: (_) => buscarPesquisas(),
                       ),
                     ),
-                  ),
+                    IconButton(
+                      onPressed: buscarPesquisas,
+                      icon: Icon(Icons.search, color: laranja, size: 26),
+                    ),
+                  ],
                 ),
-                IconButton(
-                  onPressed: buscarPesquisas,
-                  icon: Icon(Icons.search),
-                  color: laranja,
-                ),
-              ],
-            ),
+              ),
             const SizedBox(height: 16),
             _loading
                 ? CircularProgressIndicator(color: laranja)

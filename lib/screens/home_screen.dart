@@ -21,10 +21,7 @@ class _HomePageState extends State<HomePage> {
 
     // 2. As variáveis de UI são definidas com base nos valores do provider
     final fundo = settings.isDarkMode ? Color(0xFF1A1A1A) : Colors.white;
-    final texto = settings.isDarkMode ? Colors.white : Colors.black;
     final destaque = Color(0xFFFF6B35);
-    final fundoCard = settings.isDarkMode ? Color(0xFF2A2A2A) : Color(0xFFF0F0F0);
-    final textoSecundario = settings.isDarkMode ? Colors.white70 : Colors.black54;
     final fontSize = settings.fontSize;
 
     return Scaffold(

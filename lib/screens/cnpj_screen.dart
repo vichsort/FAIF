@@ -88,37 +88,35 @@ class _ConsultaCnpjPageState extends State<ConsultaCnpjPage> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _controller,
-                      style: TextStyle(color: texto, fontSize: fontSize),
-                      decoration: InputDecoration(
-                        hintText: 'Buscar CNPJ',
-                        hintStyle: TextStyle(
-                          color: Colors.grey,
-                          fontSize: fontSize - 2,
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                decoration: BoxDecoration(
+                  color: fundoInput,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: laranja, width: 2),
+                ),
+                child: Row(
+                  children: [
+                    Image.asset("assets/logo.png", width: 28, height: 28),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: TextField(
+                        controller: _controller,
+                        style: TextStyle(color: texto, fontSize: 16),
+                        decoration: InputDecoration(
+                          hintText: "Pesquisar por nome...",
+                          hintStyle: TextStyle(color: Colors.grey[500]),
+                          border: InputBorder.none,
                         ),
-                        filled: true,
-                        fillColor: fundoInput,
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(color: laranja, width: 2),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(color: laranja, width: 2),
-                        ),
+                        onSubmitted: (_) => consultarCnpj(),
                       ),
                     ),
-                  ),
-                  IconButton(
-                    onPressed: consultarCnpj,
-                    icon: Icon(Icons.search),
-                    color: laranja,
-                  ),
-                ],
+                    IconButton(
+                      onPressed: consultarCnpj,
+                      icon: Icon(Icons.search, color: laranja, size: 26),
+                    ),
+                  ],
+                ),
               ),
 
               const SizedBox(height: 24),

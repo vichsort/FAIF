@@ -1,6 +1,8 @@
 import 'package:faif/services/api_service.dart';
 import 'package:flutter/material.dart';
 import '../model/deputado_model.dart';
+import 'package:faif/providers/settings_provider.dart';
+import 'package:provider/provider.dart';
 import '../components/deputado_card.dart';
 
 class DeputadosPage extends StatefulWidget {
@@ -9,9 +11,9 @@ class DeputadosPage extends StatefulWidget {
 }
 
 class DeputadosPageState extends State<DeputadosPage> {
-  final ApiService _apiService = ApiService(); 
+  final ApiService _apiService = ApiService();
   final TextEditingController _controller = TextEditingController();
-  
+
   bool _loading = false;
   String? _error;
   List<Deputado> _deputados = [];
@@ -20,20 +22,22 @@ class DeputadosPageState extends State<DeputadosPage> {
     if (_controller.text.trim().isEmpty) {
       return;
     }
-    
+
     setState(() {
       _loading = true;
       _error = null;
     });
 
     try {
-      final deputadosEncontrados = await _apiService.fetchDeputados(_controller.text.trim());
+      final deputadosEncontrados = await _apiService.fetchDeputados(
+        _controller.text.trim(),
+      );
       setState(() {
         _deputados = deputadosEncontrados;
       });
     } catch (e) {
       setState(() {
-        _error = e.toString().replaceFirst('Exception: ', ''); 
+        _error = e.toString().replaceFirst('Exception: ', '');
         _deputados = [];
       });
     } finally {
@@ -45,25 +49,40 @@ class DeputadosPageState extends State<DeputadosPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final fundo = isDarkMode ? const Color(0xFF0F1115) : Colors.white;
-    final texto = isDarkMode ? Colors.white : Colors.black;
+    final settings = Provider.of<SettingsProvider>(context);
+    final fundo = settings.isDarkMode ? const Color(0xFF1A1A1A) : Colors.white;
+    final fundoInput = settings.isDarkMode
+        ? const Color(0xFF2A2A2A)
+        : Colors.grey[200]!;
+    final texto = settings.isDarkMode ? Colors.white : Colors.black;
     final laranja = const Color(0xFFFF6B35);
+    final fontSize = settings.fontSize;
 
     return Scaffold(
       backgroundColor: fundo,
+      appBar: AppBar(
+        backgroundColor: fundo,
+        elevation: 0,
+        iconTheme: IconThemeData(color: laranja),
+        title: Text(
+          'Deputados',
+          style: TextStyle(
+            color: texto,
+            fontSize: fontSize,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("Deputados", style: TextStyle(color: texto, fontSize: 28, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 20),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 decoration: BoxDecoration(
-                  color: isDarkMode ? const Color(0xFF1E1F23) : Colors.white,
+                  color: fundoInput,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: laranja, width: 2),
                 ),
@@ -91,9 +110,7 @@ class DeputadosPageState extends State<DeputadosPage> {
                 ),
               ),
               const SizedBox(height: 24),
-              Expanded(
-                child: _buildResultView(texto, laranja),
-              ),
+              Expanded(child: _buildResultView(texto, laranja)),
             ],
           ),
         ),
@@ -130,10 +147,7 @@ class DeputadosPageState extends State<DeputadosPage> {
       separatorBuilder: (_, __) => const SizedBox(height: 16),
       itemBuilder: (context, index) {
         final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-        return DeputadoCard(
-          deputado: _deputados[index],
-          isDark: isDarkMode,
-        );
+        return DeputadoCard(deputado: _deputados[index], isDark: isDarkMode);
       },
     );
   }
