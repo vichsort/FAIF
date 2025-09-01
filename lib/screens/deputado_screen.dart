@@ -1,9 +1,7 @@
+import 'package:faif/services/api_service.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import '../model/deputado_model.dart';
 import '../components/deputado_card.dart';
-import 'package:faif/screens/config_screen.dart';
 
 class DeputadosPage extends StatefulWidget {
   @override
@@ -11,31 +9,38 @@ class DeputadosPage extends StatefulWidget {
 }
 
 class DeputadosPageState extends State<DeputadosPage> {
+  final ApiService _apiService = ApiService(); 
   final TextEditingController _controller = TextEditingController();
+  
   bool _loading = false;
+  String? _error;
   List<Deputado> _deputados = [];
 
   Future<void> buscarDeputados() async {
+    if (_controller.text.trim().isEmpty) {
+      return;
+    }
+    
     setState(() {
       _loading = true;
-      _deputados = [];
+      _error = null;
     });
 
-    final nome = _controller.text.trim();
-    final url = Uri.parse('http://localhost:5000/faif/deputados/$nome');
-    final response = await http.get(url);
-
-    setState(() {
-      _loading = false;
-      if (response.statusCode == 200) {
-        final List<dynamic> jsonList = json.decode(response.body);
-        _deputados = jsonList.map((e) => Deputado.fromJson(e)).toList();
-      } else {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text("Erro na consulta.")));
-      }
-    });
+    try {
+      final deputadosEncontrados = await _apiService.fetchDeputados(_controller.text.trim());
+      setState(() {
+        _deputados = deputadosEncontrados;
+      });
+    } catch (e) {
+      setState(() {
+        _error = e.toString().replaceFirst('Exception: ', ''); 
+        _deputados = [];
+      });
+    } finally {
+      setState(() {
+        _loading = false;
+      });
+    }
   }
 
   @override
@@ -53,16 +58,8 @@ class DeputadosPageState extends State<DeputadosPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                "Deputados",
-                style: TextStyle(
-                  color: texto,
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              Text("Deputados", style: TextStyle(color: texto, fontSize: 28, fontWeight: FontWeight.bold)),
               const SizedBox(height: 20),
-
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 decoration: BoxDecoration(
@@ -79,10 +76,11 @@ class DeputadosPageState extends State<DeputadosPage> {
                         controller: _controller,
                         style: TextStyle(color: texto, fontSize: 16),
                         decoration: InputDecoration(
-                          hintText: "Pesquisa...",
+                          hintText: "Pesquisar por nome...",
                           hintStyle: TextStyle(color: Colors.grey[500]),
                           border: InputBorder.none,
                         ),
+                        onSubmitted: (_) => buscarDeputados(),
                       ),
                     ),
                     IconButton(
@@ -92,35 +90,51 @@ class DeputadosPageState extends State<DeputadosPage> {
                   ],
                 ),
               ),
-
               const SizedBox(height: 24),
-
-              // resultados
               Expanded(
-                child: _loading
-                    ? Center(child: CircularProgressIndicator(color: laranja))
-                    : _deputados.isEmpty
-                    ? Center(
-                        child: Text(
-                          'Nenhum resultado encontrado.',
-                          style: TextStyle(color: texto, fontSize: 16),
-                        ),
-                      )
-                    : ListView.separated(
-                        itemCount: _deputados.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 16),
-                        itemBuilder: (context, index) {
-                          return DeputadoCard(
-                            deputado: _deputados[index],
-                            isDark: isDarkMode,
-                          );
-                        },
-                      ),
+                child: _buildResultView(texto, laranja),
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildResultView(Color textColor, Color highlightColor) {
+    if (_loading) {
+      return Center(child: CircularProgressIndicator(color: highlightColor));
+    }
+
+    if (_error != null) {
+      return Center(
+        child: Text(
+          _error!,
+          textAlign: TextAlign.center,
+          style: TextStyle(color: Colors.red[400], fontSize: 16),
+        ),
+      );
+    }
+
+    if (_deputados.isEmpty) {
+      return Center(
+        child: Text(
+          'Nenhum resultado encontrado.',
+          style: TextStyle(color: textColor, fontSize: 16),
+        ),
+      );
+    }
+
+    return ListView.separated(
+      itemCount: _deputados.length,
+      separatorBuilder: (_, __) => const SizedBox(height: 16),
+      itemBuilder: (context, index) {
+        final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+        return DeputadoCard(
+          deputado: _deputados[index],
+          isDark: isDarkMode,
+        );
+      },
     );
   }
 }

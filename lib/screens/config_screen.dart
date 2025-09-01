@@ -9,12 +9,10 @@ class ConfigScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 1. Usamos um Consumer para ter acesso ao provider.
-    // Ele reconstrói a UI automaticamente quando os valores em `settings` mudam.
+
     return Consumer<SettingsProvider>(
       builder: (context, settings, child) {
         
-        // Cores e fontes são lidas diretamente do `settings` do provider
         final Color fundo = settings.isDarkMode ? const Color(0xFF1A1A1A) : Colors.white;
         final Color texto = settings.isDarkMode ? Colors.white : Colors.black;
         final double fontSize = settings.fontSize;
@@ -44,9 +42,6 @@ class ConfigScreen extends StatelessWidget {
                   label: '${fontSize.round()}',
                   activeColor: const Color(0xFFFF6B35),
                   onChanged: (value) {
-                    // 2. Ao mudar, chamamos o método do provider para ATUALIZAR o estado.
-                    // Usamos 'listen: false' porque estamos dentro de um callback,
-                    // a atualização da UI será feita pelo Consumer.
                     Provider.of<SettingsProvider>(context, listen: false).setFontSize(value);
                   },
                 ),
@@ -56,9 +51,8 @@ class ConfigScreen extends StatelessWidget {
                     'Modo Escuro',
                     style: TextStyle(fontSize: fontSize, color: texto),
                   ),
-                  value: settings.isDarkMode, // Lendo o valor do provider
+                  value: settings.isDarkMode,
                   onChanged: (value) {
-                    // 3. Mesma lógica para o switch: chamamos o método do provider.
                     Provider.of<SettingsProvider>(context, listen: false).toggleTheme(value);
                   },
                   activeColor: const Color(0xFFFF6B35),

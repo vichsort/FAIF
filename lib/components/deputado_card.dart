@@ -1,20 +1,16 @@
 import 'package:flutter/material.dart';
-import '../model/deputado_model.dart';
+import 'package:faif/screens/deputado_detalhes_screen.dart';
+import 'package:faif/model/deputado_model.dart';
 
 class DeputadoCard extends StatelessWidget {
   final Deputado deputado;
   final bool isDark;
 
-  const DeputadoCard({
-    super.key,
-    required this.deputado,
-    required this.isDark,
-  });
+  const DeputadoCard({super.key, required this.deputado, required this.isDark});
 
   @override
   Widget build(BuildContext context) {
     final fundo = isDark ? const Color(0xFF1A1A1A) : Colors.white;
-    final fundoInput = isDark ? const Color(0xFF2A2A2A) : Colors.grey[200]!;
     final texto = isDark ? Colors.white : Colors.black;
     final laranja = const Color(0xFFFF6B35);
 
@@ -38,10 +34,7 @@ class DeputadoCard extends StatelessWidget {
             child: deputado.urlFoto.isNotEmpty
                 ? ClipRRect(
                     borderRadius: BorderRadius.circular(8),
-                    child: Image.network(
-                      deputado.urlFoto,
-                      fit: BoxFit.cover,
-                    ),
+                    child: Image.network(deputado.urlFoto, fit: BoxFit.cover),
                   )
                 : Center(
                     child: Text(
@@ -85,14 +78,24 @@ class DeputadoCard extends StatelessWidget {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: laranja,
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 6),
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(6),
                     ),
                     textStyle: const TextStyle(fontSize: 12),
                   ),
                   onPressed: () {
-                    // TODO: ação acessar deputado
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => DeputadoDetalhesPage(
+                          deputadoId: deputado.id,
+                          deputadoNome: deputado.nome,
+                        ),
+                      ),
+                    );
                   },
                   child: const Text("Acessar"),
                 ),
