@@ -1,9 +1,10 @@
 import 'dart:convert';
+import 'package:faif/providers/settings_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:faif/model/resultado_model.dart';
 import 'package:faif/components/resultado_card.dart';
-import 'package:faif/screens/config_manual_page.dart';
+import 'package:provider/provider.dart';
 
 class BuscaUnificadaPage extends StatefulWidget {
   const BuscaUnificadaPage({super.key});
@@ -16,11 +17,6 @@ class _BuscaUnificadaPageState extends State<BuscaUnificadaPage> {
   final TextEditingController _controller = TextEditingController();
   List<ResultadoBusca> _resultados = [];
   bool _carregando = false;
-
-  final fundo = isDarkMode ? const Color(0xFF1A1A1A) : Colors.white;
-  final fundoInput = isDarkMode ? const Color(0xFF2A2A2A) : Colors.grey[200]!;
-  final texto = isDarkMode ? Colors.white : Colors.black;
-  final laranja = const Color(0xFFFF6B35);
 
   final List<String> dominios = ['Deputados', 'Emendas', 'IBGE', 'CNPJ'];
 
@@ -138,6 +134,14 @@ class _BuscaUnificadaPageState extends State<BuscaUnificadaPage> {
 
   @override
   Widget build(BuildContext context) {
+    final settings = Provider.of<SettingsProvider>(context);
+    final fundo = settings.isDarkMode ? const Color(0xFF1A1A1A) : Colors.white;
+    final fundoInput = settings.isDarkMode
+        ? const Color(0xFF2A2A2A)
+        : Colors.grey[200]!;
+    final texto = settings.isDarkMode ? Colors.white : Colors.black;
+    final laranja = const Color(0xFFFF6B35);
+
     return Scaffold(
       backgroundColor: fundo,
       appBar: AppBar(

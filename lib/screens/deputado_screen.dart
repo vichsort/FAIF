@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../model/deputado_model.dart';
 import '../components/deputado_card.dart';
-import 'package:faif/screens/config_manual_page.dart';
+import 'package:faif/screens/config_screen.dart';
 
 class DeputadosPage extends StatefulWidget {
   @override

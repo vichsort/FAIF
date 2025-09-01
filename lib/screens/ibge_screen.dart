@@ -3,7 +3,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../model/ibge_model.dart';
 import '../components/ibge_card.dart';
-import 'package:faif/screens/config_manual_page.dart';
+import 'package:faif/providers/settings_provider.dart';
+import 'package:provider/provider.dart';
 
 class IBGEScreen extends StatefulWidget {
   @override
@@ -41,10 +42,12 @@ class _IBGEScreenState extends State<IBGEScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final fundo = isDarkMode ? const Color(0xFF1A1A1A) : Colors.white;
-    final fundoInput = isDarkMode ? const Color(0xFF2A2A2A) : Colors.grey[200]!;
-    final texto = isDarkMode ? Colors.white : Colors.black;
+    final settings = Provider.of<SettingsProvider>(context);
+    final fundo = settings.isDarkMode ? const Color(0xFF1A1A1A) : Colors.white;
+    final fundoInput = settings.isDarkMode ? const Color(0xFF2A2A2A) : Colors.grey[200]!;
+    final texto = settings.isDarkMode ? Colors.white : Colors.black;
     final laranja = const Color(0xFFFF6B35);
+    final fontSize = settings.fontSize;
 
     return Scaffold(
       backgroundColor: fundo,
@@ -95,7 +98,7 @@ class _IBGEScreenState extends State<IBGEScreen> {
                             return IBGECard(
                               pesquisa: _pesquisas[index],
                               fontSize: 16,
-                              isDark: isDarkMode,
+                              isDark: settings.isDarkMode,
                             );
                           },
                         ),

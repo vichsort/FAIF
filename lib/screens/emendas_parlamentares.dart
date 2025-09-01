@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:faif/providers/settings_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:faif/model/emenda_model.dart';
 import 'package:faif/components/emenda_card.dart';
-import 'package:faif/screens/config_manual_page.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -86,9 +87,10 @@ class _EmendasPageState extends State<EmendasPage> {
 
   @override
   Widget build(BuildContext context) {
-    final fundo = isDarkMode ? const Color(0xFF1A1A1A) : Colors.white;
-    final fundoInput = isDarkMode ? const Color(0xFF2A2A2A) : Colors.grey[200]!;
-    final texto = isDarkMode ? Colors.white : Colors.black;
+    final settings = Provider.of<SettingsProvider>(context);
+    final fundo = settings.isDarkMode ? const Color(0xFF1A1A1A) : Colors.white;
+    final fundoInput = settings.isDarkMode ? const Color(0xFF2A2A2A) : Colors.grey[200]!;
+    final texto = settings.isDarkMode ? Colors.white : Colors.black;
     final laranja = const Color(0xFFFF6B35);
 
     final emendasFiltradas = _emendas;
@@ -103,7 +105,7 @@ class _EmendasPageState extends State<EmendasPage> {
           'Emendas Parlamentares',
           style: TextStyle(
             color: texto,
-            fontSize: fontSize,
+            fontSize: settings.fontSize,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -115,7 +117,7 @@ class _EmendasPageState extends State<EmendasPage> {
             // Campo: Autor
             TextField(
               onChanged: (value) => autorQuery = value,
-              style: TextStyle(color: texto, fontSize: fontSize),
+              style: TextStyle(color: texto, fontSize: settings.fontSize),
               decoration: InputDecoration(
                 labelText: 'Filtrar por autor',
                 labelStyle: TextStyle(color: texto),
@@ -145,7 +147,7 @@ class _EmendasPageState extends State<EmendasPage> {
                   value: tipo,
                   child: Text(
                     tipo,
-                    style: TextStyle(color: texto, fontSize: fontSize),
+                    style: TextStyle(color: texto, fontSize: settings.fontSize),
                   ),
                 );
               }).toList(),
@@ -160,14 +162,14 @@ class _EmendasPageState extends State<EmendasPage> {
                 ),
               ),
               dropdownColor: fundoInput,
-              style: TextStyle(color: texto, fontSize: fontSize),
+              style: TextStyle(color: texto, fontSize: settings.fontSize),
             ),
             const SizedBox(height: 10),
 
             TextField(
               keyboardType: TextInputType.number,
               onChanged: (value) => anoQuery = value,
-              style: TextStyle(color: texto, fontSize: fontSize),
+              style: TextStyle(color: texto, fontSize: settings.fontSize),
               decoration: InputDecoration(
                 labelText: 'Filtrar por ano',
                 labelStyle: TextStyle(color: texto),
@@ -187,10 +189,10 @@ class _EmendasPageState extends State<EmendasPage> {
                   : () {
                       _buscarEmendas(page: 1);
                     },
-              icon: Icon(Icons.search, size: fontSize, color: Colors.white),
+              icon: Icon(Icons.search, size: settings.fontSize, color: Colors.white),
               label: Text(
                 'Pesquisar',
-                style: TextStyle(fontSize: fontSize, color: Colors.white),
+                style: TextStyle(fontSize: settings.fontSize, color: Colors.white),
               ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: laranja,
@@ -212,7 +214,7 @@ class _EmendasPageState extends State<EmendasPage> {
                   ? Center(
                       child: Text(
                         'Nenhuma emenda encontrada.',
-                        style: TextStyle(color: texto, fontSize: fontSize),
+                        style: TextStyle(color: texto, fontSize: settings.fontSize),
                       ),
                     )
                   : Column(
@@ -223,8 +225,8 @@ class _EmendasPageState extends State<EmendasPage> {
                             itemBuilder: (context, index) {
                               return EmendaCard(
                                 emenda: emendasFiltradas[index],
-                                fontSize: fontSize,
-                                isDark: isDarkMode,
+                                fontSize: settings.fontSize,
+                                isDark: settings.isDarkMode,
                               );
                             },
                           ),

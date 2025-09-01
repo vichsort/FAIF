@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:faif/screens/config_manual_page.dart';
+import 'package:provider/provider.dart';
+import 'package:faif/providers/settings_provider.dart';
 
 class ConsultaCnpjPage extends StatefulWidget {
   @override
@@ -57,10 +58,14 @@ class _ConsultaCnpjPageState extends State<ConsultaCnpjPage> {
 
   @override
   Widget build(BuildContext context) {
-    final fundo = isDarkMode ? const Color(0xFF1A1A1A) : Colors.white;
-    final fundoInput = isDarkMode ? const Color(0xFF2A2A2A) : Colors.grey[200]!;
-    final texto = isDarkMode ? Colors.white : Colors.black;
+    final settings = Provider.of<SettingsProvider>(context);
+    final fundo = settings.isDarkMode ? const Color(0xFF1A1A1A) : Colors.white;
+    final fundoInput = settings.isDarkMode
+        ? const Color(0xFF2A2A2A)
+        : Colors.grey[200]!;
+    final texto = settings.isDarkMode ? Colors.white : Colors.black;
     final laranja = const Color(0xFFFF6B35);
+    final fontSize = settings.fontSize;
 
     return Scaffold(
       backgroundColor: fundo,
@@ -87,26 +92,26 @@ class _ConsultaCnpjPageState extends State<ConsultaCnpjPage> {
                 children: [
                   Expanded(
                     child: TextField(
-                    controller: _controller,
-                    style: TextStyle(color: texto, fontSize: fontSize),
-                    decoration: InputDecoration(
-                      hintText: 'Buscar CNPJ',
-                      hintStyle: TextStyle(
-                        color: Colors.grey,
-                        fontSize: fontSize - 2,
-                      ),
-                      filled: true,
-                      fillColor: fundoInput,
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: laranja, width: 2),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: laranja, width: 2),
+                      controller: _controller,
+                      style: TextStyle(color: texto, fontSize: fontSize),
+                      decoration: InputDecoration(
+                        hintText: 'Buscar CNPJ',
+                        hintStyle: TextStyle(
+                          color: Colors.grey,
+                          fontSize: fontSize - 2,
+                        ),
+                        filled: true,
+                        fillColor: fundoInput,
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(color: laranja, width: 2),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(color: laranja, width: 2),
+                        ),
                       ),
                     ),
-                  ),
                   ),
                   IconButton(
                     onPressed: consultarCnpj,
@@ -125,7 +130,7 @@ class _ConsultaCnpjPageState extends State<ConsultaCnpjPage> {
                   width: double.infinity,
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: isDarkMode
+                    color: settings.isDarkMode
                         ? const Color(0xFF2B1B16)
                         : const Color(0xFFFFE9E1),
                     border: Border.all(color: laranja, width: 1.5),
@@ -142,7 +147,7 @@ class _ConsultaCnpjPageState extends State<ConsultaCnpjPage> {
                   width: double.infinity,
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
-                    color: isDarkMode ? const Color(0xFF100C0A) : Colors.white,
+                    color: settings.isDarkMode ? const Color(0xFF100C0A) : Colors.white,
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(color: laranja, width: 2),
                   ),
