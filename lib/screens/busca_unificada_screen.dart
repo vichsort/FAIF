@@ -136,10 +136,6 @@ class _BuscaUnificadaPageState extends State<BuscaUnificadaPage> {
   Widget build(BuildContext context) {
     final settings = Provider.of<SettingsProvider>(context);
     final fundo = settings.isDarkMode ? const Color(0xFF1A1A1A) : Colors.white;
-    final fundoInput = settings.isDarkMode
-        ? const Color(0xFF2A2A2A)
-        : Colors.grey[200]!;
-    final texto = settings.isDarkMode ? Colors.white : Colors.black;
     final laranja = const Color(0xFFFF6B35);
 
     return Scaffold(

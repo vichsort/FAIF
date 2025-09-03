@@ -3,6 +3,8 @@ import 'package:http/http.dart' as http;
 import '../model/deputado_model.dart';
 import '../model/deputado_detalhes_model.dart';
 
+import '../model/emenda_model.dart';
+
 class ApiService {
   static const String _baseUrl = 'http://localhost:5000';
 
@@ -46,6 +48,40 @@ class ApiService {
         }
       } else {
         throw Exception('Falha ao carregar detalhes do deputado. Código: ${response.statusCode}');
+      }
+    } catch (e) {
+      print(e);
+      throw Exception('Não foi possível conectar ao servidor.');
+    }
+  }
+
+  Future<List<EmendaModel>> fetchEmendas({
+    required int page,
+    Map<String, String>? params,
+  }) async {
+    final uri = Uri.parse('$_baseUrl/faif/transparencia/emendas/$page')
+        .replace(queryParameters: params);
+
+    try {
+      final response = await http.get(
+        uri,
+        // O header com o token é adicionado aqui!
+        headers: {
+          'Accept': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> decodedJson = jsonDecode(response.body);
+
+        if (decodedJson['ok'] == true) {
+          final List<dynamic> dataList = decodedJson['data'];
+          return dataList.map((json) => EmendaModel.fromJson(json)).toList();
+        } else {
+          throw Exception('Erro da API: ${decodedJson['error']['message']}');
+        }
+      } else {
+        throw Exception('Falha ao buscar emendas. Código: ${response.statusCode}');
       }
     } catch (e) {
       print(e);

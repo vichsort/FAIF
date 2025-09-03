@@ -47,15 +47,15 @@ class _HomePageState extends State<HomePage> {
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
               maxCrossAxisExtent: 140,
-              crossAxisSpacing: 20,
-              mainAxisSpacing: 20,
+              crossAxisSpacing: 2,
+              mainAxisSpacing: 2,
               childAspectRatio: 0.9,
               children: [
                 _buildServiceIcon(context, Icons.people_outline, 'Deputados', () {
                   Navigator.push(context, MaterialPageRoute(builder: (_) => DeputadosPage()));
                 }),
                 _buildServiceIcon(context, Icons.trending_up, 'Emendas\nParlamentares', () {
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => EmendasPage(emendas: [])));
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => EmendasPage()));
                 }),
                 _buildServiceIcon(context, Icons.business_center_outlined, 'Consultar\nCNPJ', () {
                   Navigator.push(context, MaterialPageRoute(builder: (_) => ConsultaCnpjPage()));

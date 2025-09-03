@@ -1,88 +1,77 @@
+import 'package:faif/services/api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:faif/providers/settings_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:faif/model/emenda_model.dart';
 import 'package:faif/components/emenda_card.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 class EmendasPage extends StatefulWidget {
-  final List<EmendaModel> emendas;
-
-  const EmendasPage({required this.emendas, super.key});
+  const EmendasPage({super.key});
 
   @override
   State<EmendasPage> createState() => _EmendasPageState();
 }
 
 class _EmendasPageState extends State<EmendasPage> {
-  String autorQuery = '';
-  String tipoQuery = '';
-  String anoQuery = '';
+  final ApiService _apiService = ApiService();
+  final TextEditingController _autorController = TextEditingController();
+  final TextEditingController _anoController = TextEditingController();
+
+  String _tipoQuery = '';
   bool _loading = false;
+  String? _error; 
   int _page = 1;
   List<EmendaModel> _emendas = [];
 
   final List<String> tiposDisponiveis = [
-    'Todos',
-    'Individual',
-    'De bancada',
-    'De comissão',
-    'De relator',
-    'Extraordinária',
+    'Todos', 'Individual', 'De bancada', 'De comissão', 'De relator'
   ];
 
   Future<void> _buscarEmendas({int? page}) async {
     setState(() {
       _loading = true;
+      _error = null; 
       if (page != null) _page = page;
     });
 
     final params = <String, String>{};
-    if (autorQuery.trim().isNotEmpty) params['nomeAutor'] = autorQuery.trim();
-    if (tipoQuery.trim().isNotEmpty) params['tipoEmenda'] = tipoQuery.trim();
-    if (anoQuery.trim().isNotEmpty) params['ano'] = anoQuery.trim();
-
-    final uri = Uri.parse(
-      'http://localhost:5000/faif/transparencia/$_page',
-    ).replace(queryParameters: params.isEmpty ? null : params);
+    if (_autorController.text.trim().isNotEmpty) params['nomeAutor'] = _autorController.text.trim();
+    if (_tipoQuery.trim().isNotEmpty) params['tipoEmenda'] = _tipoQuery.trim();
+    if (_anoController.text.trim().isNotEmpty) params['ano'] = _anoController.text.trim();
 
     try {
-      final resp = await http.get(uri);
-      if (resp.statusCode == 200) {
-        final List<dynamic> dados = json.decode(resp.body);
-        final lista = dados
-            .map((e) => EmendaModel.fromJson(e as Map<String, dynamic>))
-            .toList();
-        setState(() {
-          _emendas = lista;
-          _loading = false;
-        });
-      } else {
-        setState(() {
-          _loading = false;
-          _emendas = [];
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Erro ao buscar emendas.')),
-        );
-      }
-    } catch (_) {
+
+      final result = await _apiService.fetchEmendas(
+        page: _page,
+        params: params,
+      );
+
       setState(() {
-        _loading = false;
+        _emendas = result;
+      });
+    } catch (e) {
+      setState(() {
+        _error = e.toString().replaceFirst('Exception: ', '');
         _emendas = [];
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Falha de conexão com a API.')),
-      );
+    } finally {
+      setState(() {
+        _loading = false;
+      });
     }
   }
 
   @override
   void initState() {
     super.initState();
-    _emendas = List.from(widget.emendas);
     _buscarEmendas(page: 1);
+  }
+
+  @override
+  void dispose() {
+    _autorController.dispose();
+    _anoController.dispose();
+    super.dispose();
   }
 
   @override
@@ -92,8 +81,6 @@ class _EmendasPageState extends State<EmendasPage> {
     final fundoInput = settings.isDarkMode ? const Color(0xFF2A2A2A) : Colors.grey[200]!;
     final texto = settings.isDarkMode ? Colors.white : Colors.black;
     final laranja = const Color(0xFFFF6B35);
-
-    final emendasFiltradas = _emendas;
 
     return Scaffold(
       backgroundColor: fundo,
@@ -114,150 +101,128 @@ class _EmendasPageState extends State<EmendasPage> {
         padding: const EdgeInsets.all(12),
         child: Column(
           children: [
-            // Campo: Autor
+            // Filtros
             TextField(
-              onChanged: (value) => autorQuery = value,
+              controller: _autorController,
               style: TextStyle(color: texto, fontSize: settings.fontSize),
-              decoration: InputDecoration(
-                labelText: 'Filtrar por autor',
-                labelStyle: TextStyle(color: texto),
-                filled: true,
-                fillColor: fundoInput,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: laranja),
-                ),
-              ),
+              decoration: _buildInputDecoration('Filtrar por autor', texto, fundoInput, laranja),
             ),
             const SizedBox(height: 10),
-
             DropdownButtonFormField<String>(
-              value: tipoQuery.isEmpty ? 'Todos' : tipoQuery,
-              onChanged: (value) {
-                setState(() {
-                  if (value == null || value == 'Todos') {
-                    tipoQuery = '';
-                  } else {
-                    tipoQuery = value;
-                  }
-                });
-              },
-              items: tiposDisponiveis.map((tipo) {
-                return DropdownMenuItem(
-                  value: tipo,
-                  child: Text(
-                    tipo,
-                    style: TextStyle(color: texto, fontSize: settings.fontSize),
-                  ),
-                );
-              }).toList(),
-              decoration: InputDecoration(
-                labelText: 'Selecionar tipo',
-                labelStyle: TextStyle(color: texto),
-                filled: true,
-                fillColor: fundoInput,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: laranja),
-                ),
-              ),
+              value: _tipoQuery.isEmpty ? 'Todos' : _tipoQuery,
+              onChanged: (value) => setState(() => _tipoQuery = (value == null || value == 'Todos') ? '' : value),
+              items: tiposDisponiveis.map((tipo) => DropdownMenuItem(value: tipo, child: Text(tipo))).toList(),
+              decoration: _buildInputDecoration('Selecionar tipo', texto, fundoInput, laranja),
               dropdownColor: fundoInput,
               style: TextStyle(color: texto, fontSize: settings.fontSize),
             ),
             const SizedBox(height: 10),
-
             TextField(
+              controller: _anoController,
               keyboardType: TextInputType.number,
-              onChanged: (value) => anoQuery = value,
               style: TextStyle(color: texto, fontSize: settings.fontSize),
-              decoration: InputDecoration(
-                labelText: 'Filtrar por ano',
-                labelStyle: TextStyle(color: texto),
-                filled: true,
-                fillColor: fundoInput,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: laranja),
-                ),
-              ),
+              decoration: _buildInputDecoration('Filtrar por ano', texto, fundoInput, laranja),
             ),
             const SizedBox(height: 16),
 
+            // Botão de Pesquisa
             ElevatedButton.icon(
-              onPressed: _loading
-                  ? null
-                  : () {
-                      _buscarEmendas(page: 1);
-                    },
+              onPressed: _loading ? null : () => _buscarEmendas(page: 1),
               icon: Icon(Icons.search, size: settings.fontSize, color: Colors.white),
-              label: Text(
-                'Pesquisar',
-                style: TextStyle(fontSize: settings.fontSize, color: Colors.white),
-              ),
+              label: Text('Pesquisar', style: TextStyle(fontSize: settings.fontSize, color: Colors.white)),
               style: ElevatedButton.styleFrom(
                 backgroundColor: laranja,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 12,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
               ),
             ),
             const SizedBox(height: 16),
-
             Expanded(
-              child: _loading
-                  ? Center(child: CircularProgressIndicator(color: laranja))
-                  : emendasFiltradas.isEmpty
-                  ? Center(
-                      child: Text(
-                        'Nenhuma emenda encontrada.',
-                        style: TextStyle(color: texto, fontSize: settings.fontSize),
-                      ),
-                    )
-                  : Column(
-                      children: [
-                        Expanded(
-                          child: ListView.builder(
-                            itemCount: emendasFiltradas.length,
-                            itemBuilder: (context, index) {
-                              return EmendaCard(
-                                emenda: emendasFiltradas[index],
-                                fontSize: settings.fontSize,
-                                isDark: settings.isDarkMode,
-                              );
-                            },
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            OutlinedButton(
-                              onPressed: _loading || _page <= 1
-                                  ? null
-                                  : () => _buscarEmendas(page: _page - 1),
-                              child: const Text('Anterior'),
-                            ),
-                            Text(
-                              'Página $_page',
-                              style: TextStyle(color: texto),
-                            ),
-                            OutlinedButton(
-                              onPressed: _loading
-                                  ? null
-                                  : () => _buscarEmendas(page: _page + 1),
-                              child: const Text('Próxima'),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+              child: _buildResultView(texto, laranja, settings),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildResultView(Color texto, Color laranja, SettingsProvider settings) {
+    if (_loading) {
+      return Center(child: CircularProgressIndicator(color: laranja));
+    }
+
+    if (_error != null) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Text(
+            _error!,
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.red[400], fontSize: settings.fontSize),
+          ),
+        ),
+      );
+    }
+    
+    if (_emendas.isEmpty) {
+      return Center(
+        child: Text(
+          'Nenhuma emenda encontrada.',
+          style: TextStyle(color: texto, fontSize: settings.fontSize),
+        ),
+      );
+    }
+
+    return Column(
+      children: [
+        Expanded(
+          child: ListView.builder(
+            itemCount: _emendas.length,
+            itemBuilder: (context, index) {
+              return EmendaCard(
+                emenda: _emendas[index],
+                fontSize: settings.fontSize,
+                isDark: settings.isDarkMode,
+              );
+            },
+          ),
+        ),
+        const SizedBox(height: 8),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            OutlinedButton(
+              onPressed: _loading || _page <= 1 ? null : () => _buscarEmendas(page: _page - 1),
+              child: const Text('Anterior'),
+            ),
+            Text('Página $_page', style: TextStyle(color: texto)),
+            OutlinedButton(
+              onPressed: _loading ? null : () => _buscarEmendas(page: _page + 1),
+              child: const Text('Próxima'),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  InputDecoration _buildInputDecoration(String label, Color textColor, Color fillColor, Color borderColor) {
+    return InputDecoration(
+      labelText: label,
+      labelStyle: TextStyle(color: textColor),
+      filled: true,
+      fillColor: fillColor,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: BorderSide.none,
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: BorderSide(color: Colors.grey.withAlpha(400)),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: BorderSide(color: borderColor, width: 2),
       ),
     );
   }
