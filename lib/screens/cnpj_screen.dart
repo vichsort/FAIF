@@ -1,8 +1,9 @@
-import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'package:provider/provider.dart';
+import 'package:faif/components/cnpj_card.dart';
+import 'package:faif/model/cnpj_model.dart';
 import 'package:faif/providers/settings_provider.dart';
+import 'package:faif/services/api_service.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ConsultaCnpjPage extends StatefulWidget {
   @override
@@ -10,50 +11,46 @@ class ConsultaCnpjPage extends StatefulWidget {
 }
 
 class _ConsultaCnpjPageState extends State<ConsultaCnpjPage> {
+  final ApiService _apiService = ApiService();
   final TextEditingController _controller = TextEditingController();
+
   bool _loading = false;
-  Map<String, dynamic>? _dados;
+  CnpjModel? _dados;
   String? _erro;
 
   Future<void> consultarCnpj() async {
+    final cnpj = _controller.text.trim();
+    if (cnpj.isEmpty) {
+      setState(() => _erro = 'Por favor, informe um CNPJ.');
+      return;
+    }
+
     setState(() {
       _loading = true;
       _dados = null;
       _erro = null;
     });
-    final cnpj = _controller.text.trim().replaceAll(RegExp(r'[.\-/\s]'), '');
-    if (cnpj.isEmpty) {
-      setState(() {
-        _loading = false;
-        _erro = 'Informe um CNPJ.';
-      });
-      return;
-    }
 
-    final url = Uri.parse('http://localhost:5000/faif/cnpj/$cnpj');
     try {
-      final response = await http.get(url);
+      final result = await _apiService.fetchCnpj(cnpj);
       setState(() {
-        _loading = false;
-        if (response.statusCode == 200) {
-          final Map<String, dynamic> dados = json.decode(response.body);
-          _dados = dados;
-        } else {
-          // Tenta extrair mensagem de erro padronizada
-          try {
-            final Map<String, dynamic> err = json.decode(response.body);
-            _erro = err['error']?['message'] ?? 'Erro na consulta.';
-          } catch (_) {
-            _erro = 'Erro na consulta.';
-          }
-        }
+        _dados = result;
       });
     } catch (e) {
       setState(() {
+        _erro = e.toString().replaceFirst('Exception: ', '');
+      });
+    } finally {
+      setState(() {
         _loading = false;
-        _erro = 'Falha de conexão com a API.';
       });
     }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -82,271 +79,90 @@ class _ConsultaCnpjPageState extends State<ConsultaCnpjPage> {
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 8.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                decoration: BoxDecoration(
-                  color: fundoInput,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: laranja, width: 2),
-                ),
-                child: Row(
-                  children: [
-                    Image.asset("assets/logo.png", width: 28, height: 28),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: TextField(
-                        controller: _controller,
-                        style: TextStyle(color: texto, fontSize: 16),
-                        decoration: InputDecoration(
-                          hintText: "Pesquisar por nome...",
-                          hintStyle: TextStyle(color: Colors.grey[500]),
-                          border: InputBorder.none,
-                        ),
-                        onSubmitted: (_) => consultarCnpj(),
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: consultarCnpj,
-                      icon: Icon(Icons.search, color: laranja, size: 26),
-                    ),
-                  ],
-                ),
+      body: Padding(
+        padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 16.0),
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              decoration: BoxDecoration(
+                color: fundoInput,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: laranja, width: 2),
               ),
-
-              const SizedBox(height: 24),
-
-              if (_loading) CircularProgressIndicator(color: laranja),
-
-              if (!_loading && _erro != null)
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: settings.isDarkMode
-                        ? const Color(0xFF2B1B16)
-                        : const Color(0xFFFFE9E1),
-                    border: Border.all(color: laranja, width: 1.5),
-                    borderRadius: BorderRadius.circular(12),
+              child: Row(
+                children: [
+                  Image.asset("assets/logo.png", width: 28, height: 28),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: TextField(
+                      controller: _controller,
+                      style: TextStyle(color: texto, fontSize: 16),
+                      decoration: InputDecoration(
+                        hintText: "Digite o CNPJ...",
+                        hintStyle: TextStyle(color: Colors.grey[500]),
+                        border: InputBorder.none,
+                      ),
+                      onSubmitted: (_) => consultarCnpj(),
+                    ),
                   ),
-                  child: Text(
-                    _erro!,
-                    style: TextStyle(color: texto, fontSize: fontSize),
+                  IconButton(
+                    onPressed: _loading ? null : consultarCnpj,
+                    icon: Icon(Icons.search, color: laranja, size: 26),
                   ),
-                ),
-
-              if (!_loading && _dados != null)
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    color: settings.isDarkMode ? const Color(0xFF100C0A) : Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: laranja, width: 2),
-                  ),
-                  child: _CnpjDetalhes(
-                    dados: _dados!,
-                    texto: texto,
-                    laranja: laranja,
-                  ),
-                ),
-            ],
-          ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+            Expanded(child: _buildResultView(settings)),
+          ],
         ),
       ),
     );
   }
-}
 
-class _CnpjDetalhes extends StatelessWidget {
-  final Map<String, dynamic> dados;
-  final Color texto;
-  final Color laranja;
+  Widget _buildResultView(SettingsProvider settings) {
+    if (_loading) {
+      return Center(
+        child: CircularProgressIndicator(color: const Color(0xFFFF6B35)),
+      );
+    }
 
-  const _CnpjDetalhes({
-    required this.dados,
-    required this.texto,
-    required this.laranja,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'REPÚBLICA FEDERATIVA DA PESSOA JURÍDICA',
+    if (_erro != null) {
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: settings.isDarkMode
+              ? const Color(0xFF2B1B16)
+              : const Color(0xFFFFE9E1),
+          border: Border.all(color: const Color(0xFFFF6B35), width: 1.5),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Text(
+          _erro!,
+          textAlign: TextAlign.center,
           style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 15,
-            color: texto,
-            letterSpacing: 0.5,
+            color: settings.isDarkMode ? Colors.white : Colors.black,
+            fontSize: settings.fontSize,
           ),
         ),
-        const SizedBox(height: 2),
-        Text(
-          'COMPROVANTE DE INSCRIÇÃO E DE SITUAÇÃO CADASTRAL',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 13,
-            color: texto,
-          ),
-        ),
-        Divider(color: texto.withOpacity(0.2), height: 24),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            _linha('NOME EMPRESARIAL', dados['nome'] ?? '', texto),
-            _linha('DATA DE ABERTURA', dados['abertura'] ?? '', texto),
-          ],
-        ),
-        const SizedBox(height: 4),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            _linha('NOME FANTASIA', dados['fantasia'] ?? '', texto),
-            _linha('PORTE', dados['porte'] ?? '', texto),
-          ],
-        ),
-        const SizedBox(height: 4),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            _linha('CNPJ', dados['cnpj'] ?? '', texto),
-            _linha(
-              'NATUREZA JURÍDICA',
-              dados['natureza_juridica'] ?? '',
-              texto,
-            ),
-          ],
-        ),
-        Divider(color: texto.withOpacity(0.2), height: 24),
-        Text(
-          'ATIVIDADE PRINCIPAL:',
-          style: TextStyle(fontWeight: FontWeight.bold, color: texto),
-        ),
-        ...((dados['atividade_principal'] ?? []) as List)
-            .map<Widget>(
-              (a) => Text(
-                '${a['code'] ?? ''} - ${a['text'] ?? ''}',
-                style: TextStyle(color: texto.withOpacity(0.7)),
-              ),
-            )
-            .toList(),
-        const SizedBox(height: 8),
-        if ((dados['atividades_secundarias'] ?? []).isNotEmpty)
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'ATIVIDADES SECUNDÁRIAS:',
-                style: TextStyle(fontWeight: FontWeight.bold, color: texto),
-              ),
-              ...((dados['atividades_secundarias'] ?? []) as List)
-                  .map<Widget>(
-                    (a) => Text(
-                      '${a['code'] ?? ''} - ${a['text'] ?? ''}',
-                      style: TextStyle(color: texto.withOpacity(0.7)),
-                    ),
-                  )
-                  .toList(),
-            ],
-          ),
-        Divider(color: texto.withOpacity(0.2), height: 24),
-        Text(
-          'ENDEREÇO:',
-          style: TextStyle(fontWeight: FontWeight.bold, color: texto),
-        ),
-        Text(
-          '${dados['logradouro'] ?? ''}, ${dados['numero'] ?? ''} ${dados['complemento'] ?? ''}\n${dados['bairro'] ?? ''} - ${dados['municipio'] ?? ''}/${dados['uf'] ?? ''}\nCEP: ${dados['cep'] ?? ''}',
-          style: TextStyle(color: texto.withOpacity(0.7)),
-        ),
-        Divider(color: texto.withOpacity(0.2), height: 24),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            _linha('SITUAÇÃO CADASTRAL', dados['situacao'] ?? '', texto),
-            _linha(
-              'DATA DA SITUAÇÃO CADASTRAL',
-              dados['data_situacao'] ?? '',
-              texto,
-            ),
-          ],
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            _linha('CAPITAL SOCIAL', dados['capital_social'] ?? '', texto),
-            _linha(
-              'MOTIVO DE SITUAÇÃO CADASTRAL',
-              dados['motivo_situacao'] ?? '',
-              texto,
-            ),
-          ],
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            _linha(
-              'SITUAÇÃO ESPECIAL',
-              dados['situacao_especial'] ?? '',
-              texto,
-            ),
-            _linha(
-              'DATA DA SITUAÇÃO ESPECIAL',
-              dados['data_situacao_especial'] ?? '',
-              texto,
-            ),
-          ],
-        ),
-        Divider(color: texto.withOpacity(0.2), height: 24),
-        if ((dados['qsa'] ?? []).isNotEmpty)
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'QUADRO SOCIETÁRIO:',
-                style: TextStyle(fontWeight: FontWeight.bold, color: texto),
-              ),
-              ...((dados['qsa'] ?? []) as List)
-                  .map<Widget>(
-                    (s) => Text(
-                      '${s['qual'] ?? ''}: ${s['nome'] ?? ''}',
-                      style: TextStyle(color: texto.withOpacity(0.7)),
-                    ),
-                  )
-                  .toList(),
-            ],
-          ),
-      ],
-    );
-  }
+      );
+    }
 
-  Widget _linha(String titulo, Object? valor, Color color) {
-    final text = (valor ?? '').toString();
-    if (text.isEmpty) return const SizedBox.shrink();
-    return Expanded(
-      child: Padding(
-        padding: const EdgeInsets.only(bottom: 4.0),
-        child: RichText(
-          text: TextSpan(
-            style: TextStyle(color: color, fontSize: 13),
-            children: [
-              TextSpan(
-                text: '$titulo: ',
-                style: TextStyle(fontWeight: FontWeight.bold, color: color),
-              ),
-              TextSpan(
-                text: text,
-                style: TextStyle(color: color),
-              ),
-            ],
-          ),
+    if (_dados != null) {
+      return CnpjCard(
+        cnpj: _dados!,
+        isDark: settings.isDarkMode,
+        fontSize: settings.fontSize,
+      );
+    }
+
+    return Center(
+      child: Text(
+        'Digite um CNPJ para iniciar a consulta.',
+        style: TextStyle(
+          color: settings.isDarkMode ? Colors.white70 : Colors.black54,
         ),
       ),
     );

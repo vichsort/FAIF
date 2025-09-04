@@ -1,46 +1,47 @@
-class PesquisaIBGE {
-  final String codigo;
+class ClassificacaoTematica {
   final String nome;
-  final String categoria;
-  final List<ClassificacaoTematica> classificacoesTematicas;
+  final String dominio;
+  
+  ClassificacaoTematica({required this.nome, required this.dominio});
 
-  PesquisaIBGE({
-    required this.codigo,
-    required this.nome,
-    required this.categoria,
-    required this.classificacoesTematicas,
-  });
-
-  factory PesquisaIBGE.fromJson(Map<String, dynamic> json) {
-    return PesquisaIBGE(
-      codigo: json['codigo'],
-      nome: json['nome'],
-      categoria: json['categoria'],
-      classificacoesTematicas: json['classificacoes_tematicas'] != null
-          ? (json['classificacoes_tematicas'] as List)
-              .map((e) => ClassificacaoTematica.fromJson(e))
-              .toList()
-          : [],
+  factory ClassificacaoTematica.fromJson(Map<String, dynamic> json) {
+    return ClassificacaoTematica(
+      nome: json['nome'] ?? '',
+      dominio: json['dominio'] ?? '',
     );
   }
 }
 
-class ClassificacaoTematica {
+class PesquisaIBGE {
+  final String categoria;
+  final List<ClassificacaoTematica> classificacoesTematicas;
+  final String codigo;
   final String nome;
-  final String descricao;
-  final String dominio;
+  final String periodicidadeDivulgacao;
+  final String situacao;
 
-  ClassificacaoTematica({
+  PesquisaIBGE({
+    required this.categoria,
+    required this.classificacoesTematicas,
+    required this.codigo,
     required this.nome,
-    required this.descricao,
-    required this.dominio,
+    required this.periodicidadeDivulgacao,
+    required this.situacao,
   });
 
-  factory ClassificacaoTematica.fromJson(Map<String, dynamic> json) {
-    return ClassificacaoTematica(
-      nome: json['nome'],
-      descricao: json['descricao'] ?? '',
-      dominio: json['dominio'] ?? '',
+  factory PesquisaIBGE.fromJson(Map<String, dynamic> json) {
+    var temas = json['classificacoes_tematicas'] as List?;
+    List<ClassificacaoTematica> temasList = temas
+        ?.map((e) => ClassificacaoTematica.fromJson(e))
+        .toList() ?? [];
+
+    return PesquisaIBGE(
+      categoria: json['categoria'] ?? '',
+      classificacoesTematicas: temasList,
+      codigo: json['codigo'] ?? '',
+      nome: json['nome'] ?? 'Nome indisponível',
+      periodicidadeDivulgacao: json['periodicidade_divulgacao'] ?? '',
+      situacao: json['situacao'] ?? 'Inativa',
     );
   }
 }
